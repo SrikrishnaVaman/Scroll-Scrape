@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Scroll Scrape palette (spec.md > Look and Feel). Light theme only. */
+@theme inline {
+  --color-cream: #fff8f3;
+  --color-surface: #ffffff;
+  --color-flamingo: #f2668b;
+  --color-flamingo-dark: #d94c73;
+  --color-coral: #ff9e80;
+  --color-lagoon: #3fa7d6;
+  --color-sand: #f3e3cf;
+  --color-ink: #2b2a33;
+  --color-muted: #6e6a72;
+  --color-line: #efe6e0;
+  --font-sans: var(--font-nunito);
+  --radius-card: 16px;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}

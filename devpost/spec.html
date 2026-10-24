@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll Scrape Spec</title>
+<style>
+  :root {
+    --bg: #fbf8f5; --surface: #ffffff; --text: #22201e; --muted: #625d58;
+    --border: #ece5df; --accent: #d9476f; --accent-soft: #fde8ee;
+    --sky: #2f7fa8; --sky-soft: #e4f1f8;
+    --later: #8a6d1f; --later-soft: #f6efd9; --cut: #9b3b32; --cut-soft: #f7e3e0;
+    --code: #f5efe9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171514; --surface: #211e1d; --text: #efe9e5; --muted: #ada59f;
+      --border: #3a3431; --accent: #f28aa6; --accent-soft: #3b2129;
+      --sky: #84c3e3; --sky-soft: #1c2f39;
+      --later: #e0c274; --later-soft: #352d17; --cut: #ec8e84; --cut-soft: #3a211e;
+      --code: #2a2624;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171514; --surface: #211e1d; --text: #efe9e5; --muted: #ada59f;
+    --border: #3a3431; --accent: #f28aa6; --accent-soft: #3b2129;
+    --sky: #84c3e3; --sky-soft: #1c2f39;
+    --later: #e0c274; --later-soft: #352d17; --cut: #ec8e84; --cut-soft: #3a211e;
+    --code: #2a2624;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: 13px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 6px 0 12px; }
+  h2 { font-size: 21px; margin: 44px 0 12px; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p.lead { font-size: 18px; color: var(--muted); margin: 0 0 20px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--muted); }
+  .pill.status { border-color: var(--accent); color: var(--accent); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+  .muted { color: var(--muted); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+  code { background: var(--code); padding: 1px 5px; border-radius: 5px; }
+  .rule { border-left: 4px solid var(--accent); }
+  .rule strong { color: var(--accent); }
+
+  /* architecture diagram */
+  .diagram { overflow-x: auto; }
+  @media (max-width: 640px) { .diagram svg { min-width: 680px; } }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { fill: var(--text); font-family: inherit; }
+  svg .sub { fill: var(--muted); font-size: 12px; }
+  svg .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; fill: var(--muted); }
+  svg .blk rect { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; transition: all .2s; }
+  svg .blk.on rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+  svg .blk.off { opacity: .38; }
+  svg .edge { stroke: var(--border); stroke-width: 2; fill: none; transition: all .2s; }
+  svg .edge.on { stroke: var(--accent); stroke-width: 3; }
+  svg .edge.off { opacity: .35; }
+  svg .elabel { font-size: 11px; fill: var(--muted); }
+  svg .arrowhead { fill: var(--accent); }
+  .steps { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 10px; }
+  .steps button { font: inherit; font-size: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+  .steps button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .stepbox h3 { font-size: 17px; }
+  .stepbox ol { margin: 6px 0 10px; padding-left: 20px; }
+  .stepbox li { margin: 4px 0; }
+  .files { display: flex; flex-wrap: wrap; gap: 6px; }
+  .files code { font-size: 12px; }
+
+  /* data model */
+  .tables { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .tbl { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .tbl h3 { margin: 0; padding: 8px 12px; background: var(--sky-soft); color: var(--sky); font-size: 14px; font-family: ui-monospace, Menlo, monospace; }
+  .tbl ul { list-style: none; margin: 0; padding: 8px 12px 10px; font-size: 13px; }
+  .tbl li { padding: 2px 0; }
+  .tbl .fk { color: var(--accent); }
+  .tbl .est { color: var(--sky); }
+  .rls { margin-top: 12px; font-size: 14px; }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .tablewrap { overflow-x: auto; }
+  a { color: var(--sky); }
+
+  /* palette */
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+  .sw { width: 120px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface); font-size: 12px; }
+  .sw div { height: 48px; }
+  .sw span { display: block; padding: 6px 8px; }
+  .fontsample { font-family: "Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
+
+  /* reveals */
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin: 8px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  details ol, details ul { margin: 8px 0 0; padding-left: 20px; }
+  details li { margin: 4px 0; }
+  details p { margin: 8px 0 0; }
+  pre.tree { background: var(--code); border-radius: 12px; padding: 16px; overflow-x: auto; line-height: 1.5; margin: 0; }
+  pre.tree .c { color: var(--muted); }
+  .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-right: 6px; white-space: nowrap; }
+  .tag.k { background: var(--accent-soft); color: var(--accent); }
+  .tag.r { background: var(--sky-soft); color: var(--sky); }
+  .tag.o { background: var(--later-soft); color: var(--later); }
+  .fail li { margin: 8px 0; }
+  .fail strong { color: var(--cut); }
+  .cutorder { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; font-size: 14px; }
+  .cutorder span.n { background: var(--cut-soft); color: var(--cut); border-radius: 999px; padding: 2px 10px; font-weight: 600; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Technical Specification</div>
+  <h1>Scroll Scrape</h1>
+  <p class="lead">How Scroll Scrape is built: one Next.js app online on Vercel, with Supabase for sign-in and data, Gemini for reading and planning, and Google Maps for the facts.</p>
+  <div class="meta">
+    <span class="pill">Author: Krishna (solo)</span>
+    <span class="pill">Devpost Learn · Build With AI: Basics</span>
+    <span class="pill">24 October 2026</span>
+    <span class="pill status">Draft for review</span>
+  </div>
+
+  <h2>How it works, in plain language</h2>
+  <div class="grid">
+    <div class="card"><h3>The screens</h3><p class="muted" style="margin:0">React pages in the browser: Home, Saved, Add, Plan, Profile, City View, Place Details and Memories.</p></div>
+    <div class="card"><h3>The backend</h3><p class="muted" style="margin:0">Small server routes in the same Next.js project. They hold the secret keys, because anything in the browser can be seen by anyone.</p></div>
+    <div class="card"><h3>Supabase: memory</h3><p class="muted" style="margin:0">Sign-in, the database of spaces and places, and photo files. Each user can only read their own rows.</p></div>
+    <div class="card"><h3>Gemini: reasoning</h3><p class="muted" style="margin:0">Reads captions and screenshots, estimates busy times, and plans from your saves.</p></div>
+    <div class="card"><h3>Google Maps: facts</h3><p class="muted" style="margin:0">Real address, hours, rating, price range, travel times, and the city map with pins.</p></div>
+  </div>
+  <div class="card rule" style="margin-top:14px">
+    <p style="margin:0"><strong>The honesty rule:</strong> Gemini finds and chooses; Google Maps supplies the facts. The only AI guess is busy times, always labelled. The plan route also drops any place that isn't in your saves, so "only your saves" is enforced in code, not just requested.</p>
+  </div>
+
+  <h2>Follow a journey through the system</h2>
+  <div class="card">
+    <div class="diagram">
+      <svg viewBox="0 0 880 400" role="img" aria-labelledby="archTitle">
+        <title id="archTitle">Architecture: the browser talks to Next.js server routes, which call Gemini, Google Maps and Supabase. The browser also talks to Supabase directly for sign-in, data and photos, and to Google Maps for the city map.</title>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arrowhead"/></marker>
+        </defs>
+
+        <!-- edges (drawn first) -->
+        <path id="e-b-srv" class="edge" d="M240,200 L326,200" marker-end="url(#ah)"/>
+        <text class="elabel" x="283" y="190" text-anchor="middle">fetch /api/…</text>
+        <path id="e-srv-maps" class="edge" d="M540,150 L626,95" marker-end="url(#ah)"/>
+        <path id="e-srv-gem" class="edge" d="M540,200 L626,200" marker-end="url(#ah)"/>
+        <path id="e-srv-supa" class="edge" d="M540,250 L626,305" marker-end="url(#ah)"/>
+        <path id="e-b-maps" class="edge" d="M130,50 L130,22 L740,22 L740,46" marker-end="url(#ah)"/>
+        <text class="elabel" x="435" y="16" text-anchor="middle">city map (browser key, locked to the site)</text>
+        <path id="e-b-supa" class="edge" d="M130,350 L130,382 L740,382 L740,354" marker-end="url(#ah)"/>
+        <text class="elabel" x="435" y="376" text-anchor="middle">sign-in · read spaces & places · upload photos (row-level security)</text>
+
+        <!-- blocks -->
+        <g id="b-browser" class="blk">
+          <rect x="20" y="50" width="220" height="300" rx="14"/>
+          <text x="40" y="80" font-weight="700">Browser</text>
+          <text x="40" y="100" class="sub">React screens</text>
+          <text x="40" y="132" class="mono">/ (Home, world map)</text>
+          <text x="40" y="152" class="mono">/saved  /city/[id]</text>
+          <text x="40" y="172" class="mono">/place/[id]</text>
+          <text x="40" y="192" class="mono">/add  (post | photos)</text>
+          <text x="40" y="212" class="mono">/plan  (flamingo chat)</text>
+          <text x="40" y="232" class="mono">/memories  /profile</text>
+          <text x="40" y="252" class="mono">/login  /signup</text>
+          <text x="40" y="292" class="sub">reads photo GPS + date,</text>
+          <text x="40" y="310" class="sub">shrinks photos to ~250 KB</text>
+        </g>
+        <g id="b-server" class="blk">
+          <rect x="330" y="110" width="210" height="180" rx="14"/>
+          <text x="350" y="140" font-weight="700">Next.js server routes</text>
+          <text x="350" y="160" class="sub">on Vercel · hold the secret keys</text>
+          <text x="350" y="192" class="mono">/api/identify</text>
+          <text x="350" y="212" class="mono">/api/lookup</text>
+          <text x="350" y="232" class="mono">/api/places</text>
+          <text x="350" y="252" class="mono">/api/plan</text>
+        </g>
+        <g id="b-maps" class="blk">
+          <rect x="630" y="50" width="230" height="90" rx="14"/>
+          <text x="650" y="80" font-weight="700">Google Maps</text>
+          <text x="650" y="100" class="sub">Places: find + facts</text>
+          <text x="650" y="118" class="sub">Routes: travel time · JS map</text>
+        </g>
+        <g id="b-gemini" class="blk">
+          <rect x="630" y="160" width="230" height="80" rx="14"/>
+          <text x="650" y="190" font-weight="700">Gemini</text>
+          <text x="650" y="210" class="sub">3.5 Flash-Lite · JSON answers</text>
+          <text x="650" y="227" class="sub">identify · enrich · plan</text>
+        </g>
+        <g id="b-supa" class="blk">
+          <rect x="630" y="260" width="230" height="90" rx="14"/>
+          <text x="650" y="290" font-weight="700">Supabase</text>
+          <text x="650" y="310" class="sub">Auth · Postgres · Storage</text>
+          <text x="650" y="328" class="sub">each user sees only their rows</text>
+        </g>
+      </svg>
+    </div>
+    <div class="steps" role="group" aria-label="Journey steps">
+      <button data-step="0" aria-pressed="false">Everything</button>
+      <button data-step="1" aria-pressed="false">1 · Sign in</button>
+      <button data-step="2" aria-pressed="false">2 · Home</button>
+      <button data-step="3" aria-pressed="false">3 · Save a post</button>
+      <button data-step="4" aria-pressed="false">4 · Confirm</button>
+      <button data-step="5" aria-pressed="false">5 · Browse</button>
+      <button data-step="6" aria-pressed="false">6 · Plan</button>
+      <button data-step="7" aria-pressed="false">7 · Remember</button>
+    </div>
+    <div class="stepbox" id="stepbox" aria-live="polite"></div>
+  </div>
+
+  <h2>Data model</h2>
+  <div class="tables">
+    <div class="tbl"><h3>profiles</h3><ul><li>id = sign-in user id</li><li>username</li><li>created_at</li></ul></div>
+    <div class="tbl"><h3>spaces</h3><ul><li>id · <span class="fk">user_id</span></li><li>city · country</li><li>center_lat · center_lng</li><li class="muted">one per city per user</li></ul></div>
+    <div class="tbl"><h3>places</h3><ul><li>id · <span class="fk">user_id</span> · <span class="fk">space_id → spaces</span></li><li>google_place_id · name · place_type</li><li>address · lat · lng</li><li>opening_hours · rating · rating_count</li><li>price_level · price_range · cost_per_person</li><li class="est">busy_times (AI estimate)</li><li>post_url · caption · source</li><li>visited</li></ul></div>
+    <div class="tbl"><h3>photos</h3><ul><li>id · <span class="fk">user_id</span> · <span class="fk">place_id → places</span></li><li>storage_path</li><li>taken_at · lat · lng</li><li class="muted">place_id empty = unmatched</li></ul></div>
+    <div class="tbl"><h3>plans</h3><ul><li>id · <span class="fk">user_id</span> · <span class="fk">space_id → spaces</span></li><li>request</li><li>result (stops, travel times)</li></ul></div>
+  </div>
+  <div class="card rls">
+    <strong>Who can see what:</strong> every table has <em>row-level security</em>, a rule inside the database that lets each user read and change only rows with their own <code>user_id</code>. Photos sit in a private <code>photos</code> bucket under <code>{user_id}/…</code> and are shown through short-lived signed links.
+  </div>
+  <div class="tablewrap" style="margin-top:12px">
+    <table>
+      <tr><th>Data</th><th>Lives in</th><th>Updated by</th><th>Leave and come back</th></tr>
+      <tr><td>Account, username</td><td>Supabase Auth + profiles</td><td>sign-up</td><td>still signed in until sign-out</td></tr>
+      <tr><td>Spaces, places</td><td>Supabase tables</td><td>Add → <code>/api/places</code></td><td>all there, on any device</td></tr>
+      <tr><td>Hours, rating, price</td><td>places row</td><td>fetched once at save</td><td>shown from the row, not refreshed</td></tr>
+      <tr><td>Photos</td><td>Supabase Storage + photos</td><td>Add photos</td><td>all there</td></tr>
+      <tr><td>Plans</td><td>plans</td><td>each finished plan</td><td>saved; on-screen chat starts fresh</td></tr>
+    </table>
+  </div>
+
+  <h2>Server routes</h2>
+  <details open>
+    <summary><code>POST /api/identify</code> · Gemini reads the post, Google finds the place</summary>
+    <ol>
+      <li>Gemini returns <code>{ placeName, placeType, city, country, confidence, questions? }</code>.</li>
+      <li>Low confidence: ask for comments first, then return the flamingo's questions.</li>
+      <li>Text Search <code>"name, city"</code> (IDs only, free) → Place Details (hours, rating, price range).</li>
+      <li>Returns the confirmation card. If Google finds nothing, returns Gemini's fields so the place can still be saved.</li>
+    </ol>
+    <p class="muted">Implements <code>prd.md › Saving a Place</code></p>
+  </details>
+  <details>
+    <summary><code>POST /api/lookup</code> · look up again after you edit the card</summary>
+    <p>Runs only the Google part with the edited name and city.</p>
+  </details>
+  <details>
+    <summary><code>POST /api/places</code> · estimate, then save</summary>
+    <ol>
+      <li>Gemini: a one-line busy-times estimate, plus cost per person when Google has no price range.</li>
+      <li>Create the city space if you said yes, otherwise use the existing one.</li>
+      <li>Insert the place.</li>
+    </ol>
+    <p class="muted">Implements <code>prd.md › City Spaces</code></p>
+  </details>
+  <details>
+    <summary><code>POST /api/plan</code> · plan from saves only</summary>
+    <ol>
+      <li>Work out the city; if none is named, the flamingo asks.</li>
+      <li>Load your places in that city.</li>
+      <li>Gemini picks stops <em>by place ID</em> from that list: <code>{ stops, notFound, followUp }</code>.</li>
+      <li><strong>Guard:</strong> drop any ID that isn't yours.</li>
+      <li>Google Route Matrix for travel times; check opening hours at each suggested time.</li>
+      <li>Save to <code>plans</code>, then reply. With no stops at all: "Not found on your list."</li>
+    </ol>
+    <p class="muted">Implements <code>prd.md › Planning With the Flamingo</code></p>
+  </details>
+
+  <h2>Stack</h2>
+  <div class="tablewrap card" style="padding:8px 12px">
+    <table>
+      <tr><th>Piece</th><th>Choice</th><th>Whose call</th></tr>
+      <tr><td>Framework</td><td><a href="https://nextjs.org/docs">Next.js 16</a> (App Router)</td><td><span class="tag k">Krishna</span></td></tr>
+      <tr><td>Hosting</td><td><a href="https://vercel.com/docs/frameworks/nextjs">Vercel</a>, free, from GitHub</td><td><span class="tag k">Krishna</span> (online)</td></tr>
+      <tr><td>Sign-in, data, photos</td><td><a href="https://supabase.com/docs/guides/auth/server-side/nextjs">Supabase</a></td><td><span class="tag k">Krishna</span></td></tr>
+      <tr><td>AI</td><td><a href="https://ai.google.dev/gemini-api/docs">Gemini</a> 3.5 Flash-Lite via <code>@google/genai</code></td><td><span class="tag k">Krishna</span> (Gemini) · <span class="tag r">recommended</span> (model)</td></tr>
+      <tr><td>Places, routes, map</td><td><a href="https://developers.google.com/maps/documentation/places/web-service/op-overview">Google Maps Platform</a> · <code>@vis.gl/react-google-maps</code></td><td><span class="tag k">Krishna</span> (billing OK)</td></tr>
+      <tr><td>Language</td><td>TypeScript</td><td><span class="tag r">recommended</span>, JavaScript also fine</td></tr>
+      <tr><td>Styling</td><td><a href="https://tailwindcss.com/docs">Tailwind CSS</a> · lucide-react icons</td><td><span class="tag r">recommended</span></td></tr>
+      <tr><td>Photos</td><td><a href="https://github.com/MikeKovarik/exifr">exifr</a> (GPS + date) · <a href="https://github.com/Donaldcwl/browser-image-compression">browser-image-compression</a></td><td><span class="tag r">recommended</span></td></tr>
+    </table>
+  </div>
+
+  <h2>Look and feel, ready to build</h2>
+  <div class="card">
+    <div class="swatches">
+      <div class="sw"><div style="background:#FFF8F3"></div><span>Background<br><code>#FFF8F3</code></span></div>
+      <div class="sw"><div style="background:#F2668B"></div><span>Flamingo pink<br><code>#F2668B</code></span></div>
+      <div class="sw"><div style="background:#3FA7D6"></div><span>Lagoon blue<br><code>#3FA7D6</code></span></div>
+      <div class="sw"><div style="background:#2B2A33"></div><span>Ink<br><code>#2B2A33</code></span></div>
+      <div class="sw"><div style="background:#6E6A72"></div><span>Muted<br><code>#6E6A72</code></span></div>
+      <div class="sw"><div style="background:#EFE6E0"></div><span>Border<br><code>#EFE6E0</code></span></div>
+    </div>
+    <p class="fontsample" style="font-size:22px;font-weight:700;margin:18px 0 2px">Nunito: rounded, friendly, cozy</p>
+    <p class="fontsample muted" style="margin:0">"Found it! Is this the place?" · one font, generous spacing, 16 px rounded cards, a floating pill dock.</p>
+    <ul style="margin:14px 0 0;padding-left:20px">
+      <li>Light theme only; few colours (PRD).</li>
+      <li>Photo-led place cards (ReciMe) on a calm, airy layout (mymind).</li>
+      <li>A flamingo SVG drawn for this project, with poses for waiting, talking and flying. Flat world map from public-domain Natural Earth data.</li>
+      <li>Every AI estimate carries a blue <strong>AI estimate</strong> chip.</li>
+    </ul>
+  </div>
+
+  <h2>Where it runs and how a judge tries it</h2>
+  <div class="grid">
+    <div class="card"><h3>Live</h3><p class="muted" style="margin:0">A Vercel URL, deployed from the public GitHub repo on every push to <code>main</code>.</p></div>
+    <div class="card"><h3>Judges</h3><p class="muted" style="margin:0">Sign up instantly (no confirmation email), or use the demo account pre-filled with real Singapore places. Its details go in the submission and README.</p></div>
+    <div class="card"><h3>Locally</h3><p class="muted" style="margin:0"><code>npm install</code> · copy <code>.env.example</code> to <code>.env.local</code> · <code>npm run dev</code> · open <code>localhost:3000</code></p></div>
+  </div>
+  <details>
+    <summary>Environment variables (never committed)</summary>
+    <ul>
+      <li><code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>: safe in the browser, because row-level security protects each user's data.</li>
+      <li><code>SUPABASE_SECRET_KEY</code>: <strong>secret</strong>, used by the demo seed script only.</li>
+      <li><code>GEMINI_API_KEY</code>: <strong>secret</strong>, server routes only.</li>
+      <li><code>GOOGLE_MAPS_SERVER_KEY</code>: <strong>secret</strong>, Places and Routes only.</li>
+      <li><code>NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY</code>: map only, locked to the site's web address.</li>
+    </ul>
+  </details>
+
+  <h2>Outside services and free limits</h2>
+  <p class="muted" style="margin-top:-4px">Checked 24 October 2026; re-check during setup.</p>
+  <div class="grid">
+    <div class="card"><h3>Supabase free</h3><ul style="margin:0;padding-left:18px;font-size:14px"><li>500 MB database, 1 GB files</li><li>50,000 monthly users</li><li>Pauses after 1 week idle</li><li>Turn "Confirm email" off</li></ul><p style="margin:8px 0 0;font-size:13px"><a href="https://supabase.com/pricing">supabase.com/pricing</a></p></div>
+    <div class="card"><h3>Gemini free</h3><ul style="margin:0;padding-left:18px;font-size:14px"><li>Flash and Flash-Lite only</li><li>Quota not published; reports say ~500/day for Flash-Lite, ~20/day for Flash</li><li>Free-tier prompts may be used by Google</li><li>Fallback: $5 prepaid credit</li></ul><p style="margin:8px 0 0;font-size:13px"><a href="https://ai.google.dev/gemini-api/docs">ai.google.dev</a></p></div>
+    <div class="card"><h3>Google Maps free monthly</h3><ul style="margin:0;padding-left:18px;font-size:14px"><li>Find place (IDs only): unlimited</li><li>Place facts (hours, rating, price): <strong>1,000</strong>, so fetched once at save</li><li>Travel times: 10,000</li><li>City map loads: 10,000</li><li>Card required; set quotas below the caps</li></ul><p style="margin:8px 0 0;font-size:13px"><a href="https://developers.google.com/maps/billing-and-pricing/pricing">Maps pricing</a></p></div>
+  </div>
+
+  <h2>File structure</h2>
+<pre class="tree">scroll-scrape/
+├── app/
+│   ├── (auth)/login, signup         <span class="c"># email + password (+ username)</span>
+│   ├── (app)/layout.tsx             <span class="c"># app shell with the Dock</span>
+│   ├── (app)/page.tsx               <span class="c"># Home: world map, flamingo, search</span>
+│   ├── (app)/saved, city/[spaceId], place/[placeId]
+│   ├── (app)/add, plan, memories, profile
+│   └── api/identify, lookup, places, plan   <span class="c"># the backend</span>
+├── components/                      <span class="c"># Dock, Flamingo, WorldMap, ConfirmCard,</span>
+│                                    <span class="c"># SpacePrompt, CityMap, PlaceCard, PlanStop…</span>
+├── lib/
+│   ├── supabase/client.ts, server.ts
+│   ├── gemini.ts · prompts.ts       <span class="c"># one helper + the three prompts</span>
+│   ├── maps.ts                      <span class="c"># textSearch, placeDetails, routeMatrix</span>
+│   ├── geo.ts · photos.ts · types.ts
+├── middleware.ts                    <span class="c"># keeps you signed in (name to verify)</span>
+├── supabase/migrations/001_init.sql <span class="c"># tables + row-level security</span>
+├── scripts/seed-demo.ts             <span class="c"># demo account + sample places</span>
+├── public/flamingo/*.svg, world-map.svg
+├── devpost/                         <span class="c"># planning docs</span>
+├── .env.example · LICENSE (MIT) · README.md</pre>
+
+  <h2>Where it will break, and what you'll see</h2>
+  <div class="card">
+    <ul class="fail" style="margin:0;padding-left:20px">
+      <li><strong>Gemini quota runs out:</strong> the flamingo asks for a short rest. Prevent it by checking the quota on day one and adding the $5 credit if needed.</li>
+      <li><strong>Gemini can't identify the place:</strong> it asks for comments, then the flamingo asks questions.</li>
+      <li><strong>Google can't find the place:</strong> "Not on Google Maps." The place can still be saved, and missing facts show "Not available".</li>
+      <li><strong>Gemini suggests an unsaved place:</strong> the route drops it before you see it.</li>
+      <li><strong>Photo has no location:</strong> it goes to an Unmatched list with a place picker.</li>
+      <li><strong>Supabase pauses after a week idle:</strong> open the app every few days until judging ends on 30 October.</li>
+    </ul>
+  </div>
+
+  <h2>Simplified on purpose</h2>
+  <div class="grid">
+    <div class="card"><h3>Flat map + CSS flight</h3><p class="muted" style="margin:0">Instead of a 3D globe.</p></div>
+    <div class="card"><h3>Search your own cities</h3><p class="muted" style="margin:0">The app is built from saves, so worldwide city lookup adds nothing to the demo.</p></div>
+    <div class="card"><h3>Facts stored at save</h3><p class="muted" style="margin:0">Keeps within 1,000 free place lookups a month.</p></div>
+    <div class="card"><h3>Busy times as one estimate</h3><p class="muted" style="margin:0">No live crowd source exists.</p></div>
+    <div class="card"><h3>Photos matched within 200 m</h3><p class="muted" style="margin:0">Date used to group outings.</p></div>
+    <div class="card"><h3>Email sign-in only</h3><p class="muted" style="margin:0">Google sign-in and email checks come later.</p></div>
+  </div>
+
+  <h2>Decisions and open issues</h2>
+  <div class="card">
+    <h3>Krishna decided</h3>
+    <ul style="margin:0 0 14px;padding-left:20px">
+      <li>Next.js over React plus a Python backend, accepting the learning curve.</li>
+      <li>Online on Vercel, because a laptop-only app won't cut it for judging.</li>
+      <li>Login and an online database instead of browser storage. This updated the PRD.</li>
+      <li>Supabase over Appwrite and PocketBase, after checking the free limits.</li>
+      <li>The four-sheet schema; sign-in with email and username, nothing more.</li>
+      <li>Gemini for its free tier; Google Maps billing within the free allowance.</li>
+    </ul>
+    <h3>The learning question</h3>
+    <p class="muted" style="margin:0 0 14px">"Is Supabase's free tier enough?" Text is tiny, and photos are the real limit. Shrinking them to about 250 KB raises capacity from about 300 to about 4,000. Also from this step: <em>why a backend exists</em>, which is that secret keys can't live in the browser.</p>
+    <h3>Still open</h3>
+    <ul style="margin:0;padding-left:20px">
+      <li><span class="tag o">Day one</span>Check Gemini's live free quota in AI Studio; add the $5 credit if it's under about 200 a day.</li>
+      <li><span class="tag o">Day one</span>Follow Supabase's current Next.js 16 guide for the middleware file name.</li>
+      <li><span class="tag o">Can wait</span>Name of the photo area ("Memories").</li>
+    </ul>
+    <p style="margin:14px 0 0"><strong>If time runs short, cut in this order:</strong></p>
+    <div class="cutorder"><span class="n">1</span> Memories <span class="n">2</span> Flamingo flight (keep the map) <span class="n">3</span> Rest-of-day follow-up</div>
+  </div>
+
+  <footer>Companion to <code>devpost/spec.md</code>, which is the canonical version of this plan.</footer>
+</main>
+<script>
+  (function () {
+    var ALL_B = ['b-browser', 'b-server', 'b-maps', 'b-gemini', 'b-supa'];
+    var ALL_E = ['e-b-srv', 'e-srv-maps', 'e-srv-gem', 'e-srv-supa', 'e-b-maps', 'e-b-supa'];
+    var steps = {
+      0: { t: 'The whole system', b: ALL_B, e: ALL_E,
+           d: ['Screens run in the browser.', 'Anything needing a secret key goes through the server routes.', 'Sign-in, data and photos go straight to Supabase, protected by row-level security.'],
+           f: ['app/', 'lib/', 'supabase/migrations/001_init.sql'] },
+      1: { t: '1 · Sign in', b: ['b-browser', 'b-supa'], e: ['e-b-supa'],
+           d: ['Sign up with email, password and username on /signup.', 'Supabase creates the account; the browser keeps a sign-in cookie.', 'The middleware file refreshes it and sends signed-out visitors to /login.'],
+           f: ['app/(auth)/signup/page.tsx', 'lib/supabase/client.ts', 'middleware.ts'] },
+      2: { t: '2 · Arrive on Home', b: ['b-browser', 'b-supa'], e: ['e-b-supa'],
+           d: ['Home reads your city spaces from Supabase.', 'WorldMap turns each latitude and longitude into a dot on the flat map, with no map service needed.', 'The flamingo waits for a search.'],
+           f: ['app/(app)/page.tsx', 'components/WorldMap.tsx', 'components/Flamingo.tsx', 'lib/geo.ts'] },
+      3: { t: '3 · Save a post', b: ['b-browser', 'b-server', 'b-gemini', 'b-maps'], e: ['e-b-srv', 'e-srv-gem', 'e-srv-maps'],
+           d: ['You paste a link and caption, or drop a screenshot; the browser sends it to /api/identify.', 'Gemini answers: place, type, city, confidence.', 'Google finds the place and returns hours, rating and price range.', 'You see the confirmation card. If Gemini was unsure, you get the comments box, then the flamingo’s questions.'],
+           f: ['app/(app)/add/page.tsx', 'app/api/identify/route.ts', 'lib/prompts.ts', 'lib/maps.ts', 'components/ConfirmCard.tsx'] },
+      4: { t: '4 · Confirm and create a space', b: ['b-browser', 'b-server', 'b-gemini', 'b-supa'], e: ['e-b-srv', 'e-srv-gem', 'e-srv-supa'],
+           d: ['New city? The flamingo asks first: “Create a space for Singapore?”', 'On yes, /api/places asks Gemini for a busy-times estimate (and cost, if Google has none).', 'It saves the space and the place to Supabase.'],
+           f: ['components/SpacePrompt.tsx', 'app/api/places/route.ts'] },
+      5: { t: '5 · Browse a city', b: ['b-browser', 'b-supa', 'b-maps'], e: ['e-b-supa', 'e-b-maps'],
+           d: ['Search “Singapore”: the flamingo flies to its dot.', 'City View draws the Google map with a pin per saved place, plus a list.', 'Place Details reads everything from Supabase, with no new Google calls, because the facts were stored at save time.'],
+           f: ['app/(app)/city/[spaceId]/page.tsx', 'components/CityMap.tsx', 'app/(app)/place/[placeId]/page.tsx'] },
+      6: { t: '6 · Plan with the flamingo', b: ['b-browser', 'b-server', 'b-supa', 'b-gemini', 'b-maps'], e: ['e-b-srv', 'e-srv-supa', 'e-srv-gem', 'e-srv-maps'],
+           d: ['Your message goes to /api/plan.', 'It loads only your places in that city from Supabase.', 'Gemini picks stops by place ID; the route drops anything not in your list.', 'Google gives travel times between stops; opening hours are checked.', 'The plan is saved, and the flamingo asks about the rest of your day. Nothing fits? “Not found on your list.”'],
+           f: ['app/(app)/plan/page.tsx', 'app/api/plan/route.ts', 'components/PlanStop.tsx'] },
+      7: { t: '7 · Remember', b: ['b-browser', 'b-supa'], e: ['e-b-supa'],
+           d: ['The browser reads each photo’s location and date before shrinking it, since shrinking removes them.', 'It finds the nearest saved place within 200 m, shrinks the photo to about 250 KB, and uploads it to Supabase Storage.', 'The place is marked visited, and Memories groups the photos by place and date.'],
+           f: ['components/PhotoDrop.tsx', 'lib/photos.ts', 'app/(app)/memories/page.tsx'] }
+    };
+    var box = document.getElementById('stepbox');
+    var btns = document.querySelectorAll('.steps button');
+    function show(n) {
+      var s = steps[n];
+      ALL_B.forEach(function (id) {
+        var el = document.getElementById(id);
+        var on = s.b.indexOf(id) >= 0;
+        el.classList.toggle('on', on && n !== 0);
+        el.classList.toggle('off', !on);
+      });
+      ALL_E.forEach(function (id) {
+        var el = document.getElementById(id);
+        var on = s.e.indexOf(id) >= 0;
+        el.classList.toggle('on', on);
+        el.classList.toggle('off', !on);
+      });
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.step == n ? 'true' : 'false'); });
+      var html = '<h3>' + s.t + '</h3><ol>' + s.d.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
+        '<div class="files"><span class="muted" style="font-size:13px">Files:</span>' + s.f.map(function (x) { return '<code>' + x + '</code>'; }).join('') + '</div>';
+      box.innerHTML = html;
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(+b.dataset.step); }); });
+    show(0);
+  })();
+</script>
+</body>
+</html>

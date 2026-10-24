@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll Scrape Scope</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --surface: #ffffff; --text: #1d1d1b; --muted: #5f5e58;
+    --border: #e2e0d8; --accent: #2f6f5e; --accent-soft: #e3f0eb;
+    --later: #8a6d1f; --later-soft: #f6efd9; --cut: #9b3b32; --cut-soft: #f7e3e0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151614; --surface: #1e201d; --text: #ecebe6; --muted: #a8a69e;
+      --border: #33352f; --accent: #7cc4ad; --accent-soft: #1f3530;
+      --later: #e0c274; --later-soft: #352d17; --cut: #ec8e84; --cut-soft: #3a211e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 80px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: 13px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 6px 0 12px; }
+  h2 { font-size: 21px; margin: 40px 0 12px; }
+  p.lead { font-size: 18px; color: var(--muted); margin: 0 0 20px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .pill { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--muted); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+  .kernel { border-left: 4px solid var(--accent); }
+  .kernel strong { color: var(--accent); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .step-num { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    text-align: center; line-height: 26px; font-weight: 700; font-size: 14px; margin-right: 6px; }
+  .step h3 { margin: 0 0 6px; font-size: 17px; }
+  .step p { margin: 0; color: var(--muted); font-size: 15px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { fill: var(--text); font-family: inherit; }
+  svg .sub { fill: var(--muted); font-size: 12px; }
+  svg .box { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+  svg .box.hl { fill: var(--accent-soft); stroke: var(--accent); }
+  svg .arrow { stroke: var(--accent); stroke-width: 2; fill: none; }
+  svg .arrowhead { fill: var(--accent); }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabs button { font: inherit; font-size: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .panel ul { margin: 0; padding-left: 20px; }
+  .panel li { margin: 6px 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-right: 6px; }
+  .tag.now { background: var(--accent-soft); color: var(--accent); }
+  .tag.later { background: var(--later-soft); color: var(--later); }
+  .tag.cut { background: var(--cut-soft); color: var(--cut); }
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin: 8px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { margin: 8px 0 0; color: var(--muted); }
+  .demo ol { margin: 0; padding-left: 20px; }
+  .demo li { margin: 8px 0; }
+  .wow { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: var(--accent-soft); color: var(--text); }
+  .criteria { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .criteria .card h3 { margin: 0 0 6px; font-size: 15px; color: var(--accent); }
+  .criteria .card p { margin: 0; font-size: 14px; color: var(--muted); }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Project Scope · Approved</div>
+  <h1>Scroll Scrape</h1>
+  <p class="lead">A personal space for places discovered on social media, where AI turns your saves into a timed plan for the day and your photos into a photobook.</p>
+  <div class="meta">
+    <span class="pill">Author: Krishna (solo)</span>
+    <span class="pill">Devpost Learn · Build With AI: Basics</span>
+    <span class="pill">21 October 2026</span>
+  </div>
+
+  <h2>The unique kernel</h2>
+  <div class="card kernel">
+    <p style="margin:0"><strong>Saved places become plans.</strong> Existing save-for-later features stop at storage. Scroll Scrape's AI builds an itinerary using only the places you saved, ordered by real opening hours and travel time and fitted to what you feel like doing that day.</p>
+  </div>
+
+  <h2>How it flows</h2>
+  <div class="card">
+    <svg viewBox="0 0 800 250" role="img" aria-labelledby="flowTitle">
+      <title id="flowTitle">The user saves places from Instagram into Scroll Scrape, asks for a plan, receives an itinerary, then adds photos to build a photobook.</title>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="arrowhead"/>
+        </marker>
+      </defs>
+      <!-- row 1 -->
+      <rect class="box" x="10" y="20" width="170" height="74" rx="12"/>
+      <text x="95" y="50" text-anchor="middle" font-weight="600">Instagram post</text>
+      <text x="95" y="72" text-anchor="middle" class="sub">link + caption or screenshot</text>
+
+      <rect class="box hl" x="230" y="20" width="170" height="74" rx="12"/>
+      <text x="315" y="50" text-anchor="middle" font-weight="600">1 · Save</text>
+      <text x="315" y="72" text-anchor="middle" class="sub">AI identifies, you confirm</text>
+
+      <rect class="box" x="450" y="20" width="150" height="74" rx="12"/>
+      <text x="525" y="50" text-anchor="middle" font-weight="600">Your saves</text>
+      <text x="525" y="72" text-anchor="middle" class="sub">saved places, no limit</text>
+
+      <rect class="box" x="640" y="20" width="150" height="74" rx="12"/>
+      <text x="715" y="50" text-anchor="middle" font-weight="600">2 · Ask</text>
+      <text x="715" y="72" text-anchor="middle" class="sub">your plan for the day</text>
+
+      <line class="arrow" x1="180" y1="57" x2="226" y2="57" marker-end="url(#ah)"/>
+      <line class="arrow" x1="400" y1="57" x2="446" y2="57" marker-end="url(#ah)"/>
+      <line class="arrow" x1="600" y1="57" x2="636" y2="57" marker-end="url(#ah)"/>
+
+      <!-- row 2 -->
+      <rect class="box hl" x="560" y="150" width="230" height="84" rx="12"/>
+      <text x="675" y="180" text-anchor="middle" font-weight="600">3 · Plan</text>
+      <text x="675" y="200" text-anchor="middle" class="sub">ordered stops · opening hours</text>
+      <text x="675" y="217" text-anchor="middle" class="sub">travel time · crowd estimate</text>
+
+      <rect class="box" x="300" y="150" width="200" height="84" rx="12"/>
+      <text x="400" y="180" text-anchor="middle" font-weight="600">The outing</text>
+      <text x="400" y="200" text-anchor="middle" class="sub">you go and take photos</text>
+
+      <rect class="box hl" x="40" y="150" width="200" height="84" rx="12"/>
+      <text x="140" y="180" text-anchor="middle" font-weight="600">4 · Remember</text>
+      <text x="140" y="200" text-anchor="middle" class="sub">photos matched by location</text>
+      <text x="140" y="217" text-anchor="middle" class="sub">and date → photobook</text>
+
+      <path class="arrow" d="M715,94 L715,146" marker-end="url(#ah)"/>
+      <line class="arrow" x1="560" y1="192" x2="504" y2="192" marker-end="url(#ah)"/>
+      <line class="arrow" x1="300" y1="192" x2="244" y2="192" marker-end="url(#ah)"/>
+    </svg>
+  </div>
+
+  <h2>Who it's for</h2>
+  <div class="grid">
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:16px">Primary user</h3>
+      <p style="margin:0;color:var(--muted)">Young adults anywhere in the world who save hangout spots from Instagram (restaurants, cafés, parks, arcades) to visit later with friends.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:16px">The problem today</h3>
+      <p style="margin:0;color:var(--muted)">Saves are hard to use when it's time to plan. People scroll back through folders, take screenshots, or rebuild plans from memory. The author lost saved folders after hitting Instagram's collection limit.</p>
+    </div>
+  </div>
+
+  <h2>The core loop</h2>
+  <div class="grid">
+    <div class="card step"><h3><span class="step-num">1</span>Save</h3><p>Paste a post link with its caption or a screenshot. AI identifies the place; you confirm or correct it.</p></div>
+    <div class="card step"><h3><span class="step-num">2</span>Ask</h3><p>Describe the outing you want, such as "a relaxed Saturday, affordable food, close to public transport".</p></div>
+    <div class="card step"><h3><span class="step-num">3</span>Plan</h3><p>Get an itinerary from your own saves, with opening hours, travel times and a labelled crowd estimate.</p></div>
+    <div class="card step"><h3><span class="step-num">4</span>Remember</h3><p>Add photos after the outing. They are matched to the places you visited and form a photobook.</p></div>
+  </div>
+
+  <h2>What "working" looks like</h2>
+  <div class="card demo">
+    <p style="margin:0 0 8px;color:var(--muted)">A demo video under three minutes, presented by the author:</p>
+    <ol>
+      <li><strong>The problem:</strong> hitting Instagram's saved-folder limit and losing saves.</li>
+      <li><strong>Save:</strong> an Instagram post about a place is added, and the identified place is confirmed.</li>
+      <li><strong>Plan:</strong> with several places saved, a preference produces an itinerary with real opening hours and travel times.</li>
+      <li><strong>Remember:</strong> outing photos appear against the correct places in a photobook.</li>
+    </ol>
+    <div class="wow"><strong>Key demo moment:</strong> a collection of unrelated saved posts becomes one ordered, timed plan for the day.</div>
+  </div>
+
+  <h2>Boundary: now, later, cut</h2>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-panel="now">In scope now</button>
+    <button role="tab" aria-selected="false" data-panel="later">Later</button>
+    <button role="tab" aria-selected="false" data-panel="cut">Explicitly cut</button>
+  </div>
+  <div class="card panel" id="panel-now">
+    <ul>
+      <li><span class="tag now">Now</span><strong>Place capture:</strong> link plus caption or screenshot; AI identifies the place, and the user confirms or corrects it.</li>
+      <li><span class="tag now">Now</span><strong>Saved places list.</strong></li>
+      <li><span class="tag now">Now</span><strong>AI itinerary:</strong> preference input, real opening hours and travel times, and a labelled crowd estimate.</li>
+      <li><span class="tag now">Now</span><strong>Photobook (built last):</strong> photos matched by embedded location and date; places marked visited.</li>
+    </ul>
+  </div>
+  <div class="card panel" id="panel-later" hidden>
+    <ul>
+      <li><span class="tag later">Later</span>Recipe vault with AI sorting, shopping list and steps.</li>
+      <li><span class="tag later">Later</span>One-tap saving from Instagram's share menu (as ReciMe does); needs a native app and permitted access to posts.</li>
+      <li><span class="tag later">Later</span>Place extraction from a reel's audio.</li>
+      <li><span class="tag later">Later</span>Additional platforms such as TikTok.</li>
+      <li><span class="tag later">Later</span>Backup and export.</li>
+      <li><span class="tag later">Later</span>Sharing a plan with friends.</li>
+    </ul>
+  </div>
+  <div class="panel" id="panel-cut" hidden>
+    <details><summary><span class="tag cut">Cut</span>Automatic import of Instagram saved folders</summary><p>Instagram does not allow outside apps to read a user's saves; places are added by pasting a link.</p></details>
+    <details><summary><span class="tag cut">Cut</span>Automatic photo library scanning</summary><p>Requires a native mobile app; the user selects photos instead.</p></details>
+    <details><summary><span class="tag cut">Cut</span>Live crowd data</summary><p>No official live source is available to apps; replaced by a clearly labelled AI estimate.</p></details>
+    <details><summary><span class="tag cut">Cut</span>Re-hosting a post's video or images</summary><p>Likely conflicts with platform terms; Scroll Scrape stores the link and place details only.</p></details>
+    <details><summary><span class="tag cut">Cut</span>Other explored ideas</summary><p>Late-night food finder, cab fare comparison, budget coach and group-chat planner were explored and set aside.</p></details>
+  </div>
+
+  <h2>Alignment with judging criteria</h2>
+  <div class="criteria">
+    <div class="card"><h3>Design</h3><p>One coherent journey (save, plan, remember) rather than disconnected features.</p></div>
+    <div class="card"><h3>Potential Impact</h3><p>A specific, first-hand problem for a clearly defined audience.</p></div>
+    <div class="card"><h3>Innovation</h3><p>Turns saves into a timed, preference-aware itinerary built only from your own places.</p></div>
+    <div class="card"><h3>Presentation</h3><p>A short, linear demo with a clear before-and-after moment.</p></div>
+  </div>
+
+  <footer>Companion to <code>devpost/scope.md</code>, which is the canonical version of this plan.</footer>
+</main>
+<script>
+  document.querySelectorAll('.tabs button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+      btn.setAttribute('aria-selected', 'true');
+      ['now', 'later', 'cut'].forEach(function (k) {
+        document.getElementById('panel-' + k).hidden = (k !== btn.dataset.panel);
+      });
+    });
+  });
+</script>
+</body>
+</html>
