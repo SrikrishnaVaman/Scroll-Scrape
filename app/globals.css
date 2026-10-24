@@ -20,3 +20,9 @@ body {
   background: var(--color-cream);
   color: var(--color-ink);
 }
+
+@layer components {
+  .input {
+    @apply rounded-xl border border-line bg-cream px-3 py-2 font-normal outline-none focus:border-flamingo;
+  }
+}
