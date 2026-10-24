@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:demo": "node --no-warnings --conditions=react-server --env-file=.env.local scripts/seed-demo.ts",
+    "check:auth": "node --env-file=.env.local scripts/check-auth.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.31.0",

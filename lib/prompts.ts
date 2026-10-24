@@ -53,3 +53,51 @@ export const ENRICH_SCHEMA = {
 };
 
 export type EnrichResult = { busyTimes: string; costPerPerson: string };
+
+export const PLAN_PROMPT = `You are the flamingo in Scroll Scrape, a friendly guide who plans outings using ONLY the places
+the user has personally saved. You will get the conversation so far and the user's saved places in one city.
+
+Rules:
+- Choose stops ONLY from the saved places list. Refer to each by its exact "id". Never invent a place or use one not on the list.
+- Make one stop for each part of the request (for example "casual lunch" and "cozy dinner" make two stops).
+- Rank candidates by how well they fit the request, then by being open at that time, rating, price and likely crowd.
+- If a part of the request has no good match on the list, put a short description of that part in notFound and make no stop for it.
+- purpose: a short label for the stop, such as "Casual lunch with friends" or "Cozy dinner".
+- suggestedTime: 24-hour "HH:MM", sensible for the purpose and inside the place's opening hours when known.
+- day: the day of the week the plan is for, 0 = Sunday ... 6 = Saturday. Use today unless the user names a day.
+- reason: one short sentence on why this place fits.
+- If the user accepts an offer to plan the rest of the day, return the earlier stops again plus new ones for the rest of the day.
+- reply: one or two short, warm sentences from the flamingo introducing the plan. No lists, no place details.
+- followUp: after a plan, offer to suggest saved places for the rest of the day, unless the day is already full; otherwise "".`;
+
+export const PLAN_SCHEMA = {
+  type: "object",
+  properties: {
+    reply: { type: "string" },
+    day: { type: "integer" },
+    stops: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          placeId: { type: "string" },
+          purpose: { type: "string" },
+          suggestedTime: { type: "string" },
+          reason: { type: "string" },
+        },
+        required: ["placeId", "purpose", "suggestedTime", "reason"],
+      },
+    },
+    notFound: { type: "array", items: { type: "string" } },
+    followUp: { type: "string" },
+  },
+  required: ["reply", "day", "stops", "notFound", "followUp"],
+};
+
+export type PlanResult = {
+  reply: string;
+  day: number;
+  stops: { placeId: string; purpose: string; suggestedTime: string; reason: string }[];
+  notFound: string[];
+  followUp: string;
+};

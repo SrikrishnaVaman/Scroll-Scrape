@@ -29,7 +29,7 @@ Build mode: learn
   Learner check: On Add, paste a real Instagram post link and caption for a place you know, check the card is right, fix a field if needed, create the Singapore space, then open Saved and see Singapore with 1 place. Try a screenshot of a second post too.
   Commit: `Save a post as a place with Gemini and Google Places`
 
-- [ ] **3. The flamingo plans your day using only your saved places**
+- [x] **3. The flamingo plans your day using only your saved places**
   Becomes usable: On Plan, typing "a casual lunch with friends and a cozy dinner in Singapore" returns one stop per part of the request, each from your saves, with a suggested time, today's hours (warned if closed), the AI busy estimate, cost per person, and travel time between stops. A request with no match says "Not found on your list"; a request with no city gets asked which city. A demo account filled with real Singapore places exists for planning and for judges.
   Why now: This is the unique kernel. It comes straight after saving, so the core promise ("saved places become plans") is proven while there is still time to tune it, before any of the browsing polish.
   PRD ref: `prd.md > Planning With the Flamingo` (all criteria except the rest-of-day follow-up), `prd.md > Profile` (demo account)
@@ -101,3 +101,10 @@ Reflection:
 Activity mode:
 
 ## Revisions
+
+- Added an `area` column to places (`002_place_area.sql`) — the PRD shows each place's area, but the first schema had no field for it.
+- Load `@google/genai` outside the Next.js bundle (`serverExternalPackages`) — when bundled, Gemini ignored the JSON reply format inside routes, though it worked in plain Node.
+- Turned off Next.js 16 Cache Components — every page shows one user's own data, so prerendering added complexity without benefit.
+- City for a plan is matched against the user's own space names instead of a separate Gemini call — saves free-tier quota and gives the same "which city?" behaviour.
+- Transit times use the planned time of day — at night, "leave now" transit times were nearly double.
+

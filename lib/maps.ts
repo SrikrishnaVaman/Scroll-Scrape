@@ -124,3 +124,55 @@ export function formatPriceRange(range: PriceRange | null): string | null {
   const end = range.endPrice?.units;
   return end ? `${currency} ${start}–${end}` : `${currency} ${start}+`;
 }
+
+type LatLng = { lat: number; lng: number };
+
+// Travel minutes between each pair of consecutive stops (Routes API, Compute Route Matrix).
+// `departures[i]` is when the user leaves stop i. Tries public transport first and falls back
+// to driving when transit has no route.
+export async function travelMinutes(stops: LatLng[], departures: Date[]): Promise<(number | null)[]> {
+  const legs = stops.slice(1).map(async (to, i) => {
+    const from = stops[i];
+    const [transit] = await routeMatrix([from], [to], "TRANSIT", departures[i]);
+    if (transit != null) return transit;
+    const [drive] = await routeMatrix([from], [to], "DRIVE");
+    return drive;
+  });
+  return Promise.all(legs);
+}
+
+async function routeMatrix(origins: LatLng[], destinations: LatLng[], mode: "TRANSIT" | "DRIVE", departure?: Date) {
+  const waypoint = ({ lat, lng }: LatLng) => ({
+    waypoint: { location: { latLng: { latitude: lat, longitude: lng } } },
+  });
+  const res = await fetch("https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": KEY,
+      "X-Goog-FieldMask": "originIndex,destinationIndex,duration,condition",
+    },
+    body: JSON.stringify({
+      origins: origins.map(waypoint),
+      destinations: destinations.map(waypoint),
+      travelMode: mode,
+      ...(departure && { departureTime: departure.toISOString() }),
+    }),
+  });
+  if (!res.ok) {
+    console.error("Route matrix failed", res.status, await res.text());
+    return origins.map(() => null);
+  }
+  const elements = (await res.json()) as {
+    originIndex: number;
+    destinationIndex: number;
+    duration?: string;
+    condition?: string;
+  }[];
+  // Only the diagonal matters: stop 1 -> stop 2, stop 2 -> stop 3, ...
+  return origins.map((_, i) => {
+    const e = elements.find((x) => x.originIndex === i && x.destinationIndex === i);
+    if (!e?.duration || e.condition === "ROUTE_NOT_FOUND") return null;
+    return Math.max(1, Math.round(parseInt(e.duration, 10) / 60));
+  });
+}
