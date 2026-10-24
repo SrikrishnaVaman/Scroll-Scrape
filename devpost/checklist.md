@@ -9,7 +9,7 @@ Build mode: learn
 
 ## Slices
 
-- [ ] **1. You can sign up, sign in, and land on your own Home**
+- [x] **1. You can sign up, sign in, and land on your own Home**
   Becomes usable: A running Scroll Scrape where a new visitor creates an account (email, password, username), lands on an empty Home inside the app shell with the five-button dock, and signs out from Profile. Signed-out visitors are sent to the login page.
   Why now: Every later screen and every saved row depends on knowing who the user is, and Supabase plus the Next.js 16 sign-in file are the first unfamiliar pieces. Bootstrapping (Next.js scaffold, Tailwind palette, Nunito, Supabase clients, database schema with row-level security) lands here so later slices have somewhere to go.
   PRD ref: `prd.md > Profile`, `prd.md > Screens and Layout`, `prd.md > Look and Feel`
