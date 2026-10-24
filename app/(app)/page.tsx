@@ -20,7 +20,13 @@ export default async function HomePage() {
       ) : (
         <FlamingoSays>
           <p className="font-semibold">Your cities</p>
-          <p className="text-muted">{spaces.map((s) => s.city).join(", ")}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {spaces.map((s) => (
+              <Link key={s.id} href={`/city/${s.id}`} className="rounded-full bg-flamingo/10 px-3 py-1 text-sm font-semibold text-flamingo-dark hover:bg-flamingo/20">
+                {s.city}
+              </Link>
+            ))}
+          </div>
         </FlamingoSays>
       )}
     </div>

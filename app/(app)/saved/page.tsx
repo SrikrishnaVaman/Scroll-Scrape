@@ -23,7 +23,11 @@ export default async function SavedPage() {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {spaces.map((space) => (
-            <li key={space.id} className="rounded-card border border-line bg-surface p-5 shadow-sm">
+            <li key={space.id}>
+              <Link
+                href={`/city/${space.id}`}
+                className="block rounded-card border border-line bg-surface p-5 shadow-sm transition hover:border-flamingo"
+              >
               <div className="flex items-baseline justify-between">
                 <h2 className="text-xl font-bold">{space.city}</h2>
                 <span className="text-sm text-muted">
@@ -40,6 +44,7 @@ export default async function SavedPage() {
                 ))}
                 {space.places.length > 5 && <li className="text-muted">and {space.places.length - 5} more</li>}
               </ul>
+              </Link>
             </li>
           ))}
         </ul>

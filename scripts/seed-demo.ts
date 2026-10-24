@@ -49,7 +49,7 @@ async function demoUserId() {
 const userId = await demoUserId();
 let spaceId: string | null = null;
 
-for (const [i, item] of PLACES.entries()) {
+for (const item of PLACES) {
   const card = await lookupPlace({ name: item.name, type: item.type, city: "Singapore", country: "Singapore" });
   if (!spaceId) {
     const { data, error } = await admin
@@ -95,7 +95,7 @@ for (const [i, item] of PLACES.entries()) {
     price_range: card.priceRange,
     cost_per_person: googlePrice ?? estimate.costPerPerson,
     busy_times: estimate.busyTimes,
-    post_url: `https://www.instagram.com/p/scrollscrape-demo-${i + 1}/`,
+    post_url: null, // demo places have no real post behind them
     caption: item.caption,
     source: "link",
   });

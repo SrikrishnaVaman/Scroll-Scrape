@@ -39,7 +39,7 @@ Build mode: learn
   Learner check: Sign in to the demo account, open Plan, and ask for a casual lunch and a cozy dinner in Singapore. Check that both stops are places in Saved, the times make sense, and the travel time shows. Then ask for something you never saved, such as "a ski slope in Singapore".
   Commit: `Plan a day with the flamingo from saved places only`
 
-- [ ] **4. You can browse a city on a map and open a place's details**
+- [x] **4. You can browse a city on a map and open a place's details**
   Becomes usable: Tapping a city space in Saved opens City View: a Google map centred on the city with a pin for every saved place, plus a list. Tapping a pin, a list entry, or a plan stop opens Place Details with name, type, area, hours for today and the week, the labelled busy estimate, cost per person, rating and review count, the original post link, and visited status. Missing facts show "Not available".
   Why now: With saving and planning working, this makes saved places browsable and gives plan stops somewhere to link. It needs no new external calls beyond the browser map, so it is low risk.
   PRD ref: `prd.md > City View and Place Details`, `prd.md > States and Boundaries` (missing map data)
