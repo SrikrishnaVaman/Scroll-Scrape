@@ -114,15 +114,7 @@ export default function SavePost() {
           }}
           className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-sm"
         >
-          <p className="text-muted">Paste the post&apos;s link, add a screenshot, or both. For reels, pause on the frame that shows the place.</p>
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste the Instagram link"
-            className="input text-base"
-          />
-
+          <p className="text-muted">Screenshot the post, or pause the reel on the frame that shows the place.</p>
           <label
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -155,18 +147,19 @@ export default function SavePost() {
             </ul>
           )}
 
+          <Label text="Caption (optional)">
+            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} placeholder="Paste the caption if it names the place" className="input" />
+          </Label>
+          <Label text="Post link (optional, so you can open the post later)">
+            <input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://www.instagram.com/…" className="input" />
+          </Label>
           {showDetails ? (
-            <>
-              <Label text="Caption (optional)">
-                <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} placeholder="Paste the post's caption" className="input" />
-              </Label>
-              <Label text="Comments (optional)">
-                <textarea value={comments} onChange={(e) => setComments(e.target.value)} rows={2} placeholder="Paste a few comments from under the post" className="input" />
-              </Label>
-            </>
+            <Label text="Comments (optional)">
+              <textarea value={comments} onChange={(e) => setComments(e.target.value)} rows={2} placeholder="Paste a few comments from under the post" className="input" />
+            </Label>
           ) : (
             <button type="button" onClick={() => setShowDetails(true)} className="self-start text-sm font-semibold text-lagoon">
-              + Add the caption or comments
+              + Add comments from the post
             </button>
           )}
 

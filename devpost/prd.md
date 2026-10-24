@@ -62,7 +62,7 @@ Screens reached from these:
 ### Saving a Place
 Source: `scope.md > The Core Loop` (Save), `scope.md > The POC Boundary` (Place capture).
 
-The Add screen offers two options: **Save a post** and **Add photos** (see *Memories*). Under *Save a post*, the user pastes the post link, drops in up to four screenshots (for reels, paused frames that show the place), or both. The caption and comments are optional extras, tucked behind "Add the caption or comments", because many creators show the place only on screen and not in the caption. *(Revised 25 October 2026 after Krishna's first hands-on check.)* Scroll Scrape reads only what the user provides; it does not open the post itself (`scope.md > Explicitly Cut`).
+The Add screen offers two options: **Save a post** and **Add photos** (see *Memories*). Under *Save a post*, the user's main input is up to four screenshots (for reels, paused frames that show the place). The caption and the post link are optional fields, and comments are an optional extra, because many creators show the place only on screen and not in the caption. The link is kept so the user can reopen the post later. *(Revised 25 October 2026 after Krishna's first hands-on check.)* Scroll Scrape reads only what the user provides; it does not open the post itself (`scope.md > Explicitly Cut`).
 
 The AI identifies the place name, the type of place (for example bowling alley, Italian restaurant, café) and the city. A confirmation card shows these with the place's address from map data and the post link. The user confirms or edits any field before saving.
 
