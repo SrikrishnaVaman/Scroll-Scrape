@@ -6,12 +6,14 @@ import { lookupPlace } from "@/lib/maps";
 import { IDENTIFY_PROMPT, IDENTIFY_SCHEMA, type IdentifyResult } from "@/lib/prompts";
 
 type Body = {
-  url: string;
+  url?: string;
   caption?: string;
   comments?: string;
-  screenshot?: { mimeType: string; data: string };
+  screenshots?: { mimeType: string; data: string }[];
   answers?: { question: string; answer: string }[];
 };
+
+const DEFAULT_QUESTIONS = ["What's the place called?", "Which city or area is it in?", "What kind of place is it?"];
 
 // Gemini reads the post and names the place; Google Maps then supplies the facts.
 export async function POST(request: Request) {
@@ -21,9 +23,15 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Body;
 
+    // A link alone tells us nothing (the app never opens the post), so go straight to the flamingo's questions.
+    const hasContent = body.caption || body.comments || body.screenshots?.length || body.answers?.length;
+    if (!hasContent) {
+      return NextResponse.json({ needs: "questions", questions: DEFAULT_QUESTIONS });
+    }
+
     const text = [
       IDENTIFY_PROMPT,
-      `Post link: ${body.url}`,
+      body.url && `Post link: ${body.url}`,
       body.caption && `Caption:\n${body.caption}`,
       body.comments && `Comments:\n${body.comments}`,
       body.answers?.length &&
@@ -32,27 +40,23 @@ export async function POST(request: Request) {
       .filter(Boolean)
       .join("\n\n");
 
-    const parts: Part[] = [{ text }];
-    if (body.screenshot) parts.push({ inlineData: body.screenshot });
+    // Screenshots can be several paused frames of a reel; Gemini reads them all together.
+    const parts: Part[] = [{ text }, ...(body.screenshots ?? []).map((inlineData) => ({ inlineData }))];
 
     const found = await askJson<IdentifyResult>(parts, IDENTIFY_SCHEMA);
 
-    if (found.confidence === "low" || !found.placeName) {
-      // First ask for comments; if comments (or answers) still don't settle it, ask questions.
-      if (!body.comments && !body.answers?.length) {
-        return NextResponse.json({ needs: "comments" });
-      }
-      if (!body.answers?.length) {
-        const questions = found.questions.length
-          ? found.questions
-          : ["What's the name of the place?", "Which city or area is it in?", "What kind of place is it?"];
-        return NextResponse.json({ needs: "questions", questions });
-      }
+    // Not sure which place it is: ask the flamingo's questions (once). After answers, go with the best guess.
+    if ((found.confidence === "low" || !found.placeName) && !body.answers?.length) {
+      return NextResponse.json({
+        needs: "questions",
+        questions: found.questions.length ? found.questions : DEFAULT_QUESTIONS,
+      });
     }
 
     const card = await lookupPlace({
       name: found.placeName,
       type: found.placeType,
+      area: found.area,
       city: found.city,
       country: found.country,
     });

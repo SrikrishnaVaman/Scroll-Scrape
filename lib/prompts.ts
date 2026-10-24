@@ -2,11 +2,14 @@
 
 export const IDENTIFY_PROMPT = `You read an Instagram post that someone saved because it shows a place they want to visit
 (a restaurant, cafe, bar, park, arcade, shop, museum or similar).
-Work out which single place the post is about, using the caption, any comments, the screenshot and any answers given.
+Work out which single place the post is about, using the caption, any comments, the screenshots (which may be paused
+frames of a reel, where the place name often appears as on-screen text) and any answers given.
 
 Rules:
 - placeName: the venue's own name as it would appear on Google Maps. Not a dish, a person or a hashtag.
 - placeType: a short, specific type such as "Italian restaurant", "bubble tea shop", "bowling alley", "rooftop bar".
+- area: the neighbourhood, street, mall or branch if mentioned (for example "Clarke Quay" or "Jewel Changi"), else "".
+  Chains have many branches, so this matters.
 - city: the city the place is in (for Singapore, use "Singapore"). country: the country's English name.
 - confidence: "high" only if the place name AND the city are stated or clearly implied. Otherwise "low".
 - questions: when confidence is low, up to 3 short, friendly questions that would identify the place
@@ -18,17 +21,19 @@ export const IDENTIFY_SCHEMA = {
   properties: {
     placeName: { type: "string" },
     placeType: { type: "string" },
+    area: { type: "string" },
     city: { type: "string" },
     country: { type: "string" },
     confidence: { type: "string", enum: ["high", "low"] },
     questions: { type: "array", items: { type: "string" } },
   },
-  required: ["placeName", "placeType", "city", "country", "confidence", "questions"],
+  required: ["placeName", "placeType", "area", "city", "country", "confidence", "questions"],
 };
 
 export type IdentifyResult = {
   placeName: string;
   placeType: string;
+  area: string;
   city: string;
   country: string;
   confidence: "high" | "low";

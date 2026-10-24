@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ImagePlus, X } from "lucide-react";
 import ConfirmCard from "@/components/ConfirmCard";
 import Flamingo from "@/components/Flamingo";
 import FlamingoSays from "@/components/FlamingoSays";
@@ -11,6 +12,7 @@ import type { Place, PlaceCard } from "@/lib/types";
 
 type Step =
   | { name: "form" }
+  | { name: "questions"; questions: string[]; answers: string[] }
   | { name: "card"; card: PlaceCard; original: PlaceCard }
   | { name: "space"; card: PlaceCard }
   | { name: "saved"; place: Place };
@@ -25,30 +27,33 @@ export default function SavePost() {
   const [url, setUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [comments, setComments] = useState("");
-  const [screenshot, setScreenshot] = useState<File | null>(null);
-  const [askComments, setAskComments] = useState(false);
+  const [screenshots, setScreenshots] = useState<File[]>([]);
+  const [showDetails, setShowDetails] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function identify(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy("Reading the post…");
+  async function identify(answers?: { question: string; answer: string }[]) {
+    setBusy(screenshots.length ? "Reading your screenshots…" : "Reading the post…");
     setMessage(null);
-    const shot = screenshot ? await readScreenshot(screenshot) : undefined;
-    const res = await post<{ card?: PlaceCard; needs?: "comments" | "questions"; questions?: string[] }>(
-      "/api/identify",
-      { url, caption, comments, screenshot: shot },
-    );
+    const shots = await Promise.all(screenshots.map(readScreenshot));
+    const res = await post<{ card?: PlaceCard; needs?: "questions"; questions?: string[] }>("/api/identify", {
+      url,
+      caption,
+      comments,
+      screenshots: shots,
+      answers,
+    });
     setBusy(null);
     if (res.error) return setMessage(res.error);
-    if (res.needs === "comments") {
-      setAskComments(true);
-      return setMessage("I couldn't tell which place this is. Could you paste a few comments from under the post, or add a screenshot of them?");
-    }
-    if (res.needs === "questions") {
-      return setMessage(`Still not sure! ${res.questions?.join(" ")} Add the answers to the caption box and try again.`);
+    if (res.needs === "questions" && res.questions) {
+      return setStep({ name: "questions", questions: res.questions, answers: res.questions.map(() => "") });
     }
     if (res.card) setStep({ name: "card", card: res.card, original: res.card });
+  }
+
+  function addScreenshots(files: FileList | null) {
+    if (!files) return;
+    setScreenshots((current) => [...current, ...Array.from(files)].slice(0, 4));
   }
 
   async function lookUpAgain(card: PlaceCard) {
@@ -67,7 +72,7 @@ export default function SavePost() {
       card,
       postUrl: url,
       caption,
-      source: screenshot ? "screenshot" : "link",
+      source: screenshots.length ? "screenshot" : "link",
       createSpace,
     });
     setBusy(null);
@@ -81,8 +86,8 @@ export default function SavePost() {
     setUrl("");
     setCaption("");
     setComments("");
-    setScreenshot(null);
-    setAskComments(false);
+    setScreenshots([]);
+    setShowDetails(false);
     setMessage(null);
   }
 
@@ -102,35 +107,108 @@ export default function SavePost() {
       )}
 
       {step.name === "form" && (
-        <form onSubmit={identify} className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-sm">
-          <Label text="Instagram post link">
-            <input
-              type="url"
-              required
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.instagram.com/p/…"
-              className="input"
-            />
-          </Label>
-          <Label text="Caption">
-            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={4} placeholder="Paste the post's caption" className="input" />
-          </Label>
-          <Label text={askComments ? "Comments (this would really help!)" : "Comments (optional)"}>
-            <textarea
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              rows={askComments ? 4 : 2}
-              placeholder="Paste a few comments from under the post"
-              className={`input ${askComments ? "border-flamingo ring-2 ring-flamingo/30" : ""}`}
-            />
-          </Label>
-          <Label text="Or a screenshot of the post (optional)">
-            <input type="file" accept="image/*" onChange={(e) => setScreenshot(e.target.files?.[0] ?? null)} className="text-sm" />
-          </Label>
-          <button disabled={!!busy || (!caption && !screenshot && !comments)} className="self-start rounded-full bg-flamingo px-6 py-2 font-bold text-white hover:bg-flamingo-dark disabled:opacity-50">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            identify();
+          }}
+          className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-sm"
+        >
+          <p className="text-muted">Paste the post&apos;s link, add a screenshot, or both. For reels, pause on the frame that shows the place.</p>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Paste the Instagram link"
+            className="input text-base"
+          />
+
+          <label
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              addScreenshots(e.dataTransfer.files);
+            }}
+            className="flex cursor-pointer flex-col items-center gap-2 rounded-card border-2 border-dashed border-line bg-cream px-4 py-6 text-center text-muted transition hover:border-flamingo"
+          >
+            <ImagePlus size={28} className="text-flamingo" />
+            <span className="font-semibold text-ink">Drop screenshots here or tap to choose</span>
+            <span className="text-sm">Up to 4, like paused frames from a reel</span>
+            <input type="file" accept="image/*" multiple onChange={(e) => addScreenshots(e.target.files)} className="hidden" />
+          </label>
+
+          {screenshots.length > 0 && (
+            <ul className="flex flex-wrap gap-2">
+              {screenshots.map((file, i) => (
+                <li key={i} className="flex items-center gap-1 rounded-full bg-sand/60 py-1 pr-1 pl-3 text-sm">
+                  <span className="max-w-40 truncate">{file.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setScreenshots(screenshots.filter((_, j) => j !== i))}
+                    className="rounded-full p-0.5 hover:bg-surface"
+                    aria-label={`Remove ${file.name}`}
+                  >
+                    <X size={14} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {showDetails ? (
+            <>
+              <Label text="Caption (optional)">
+                <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} placeholder="Paste the post's caption" className="input" />
+              </Label>
+              <Label text="Comments (optional)">
+                <textarea value={comments} onChange={(e) => setComments(e.target.value)} rows={2} placeholder="Paste a few comments from under the post" className="input" />
+              </Label>
+            </>
+          ) : (
+            <button type="button" onClick={() => setShowDetails(true)} className="self-start text-sm font-semibold text-lagoon">
+              + Add the caption or comments
+            </button>
+          )}
+
+          <button
+            disabled={!!busy || (!url && !screenshots.length && !caption && !comments)}
+            className="self-start rounded-full bg-flamingo px-6 py-2 font-bold text-white hover:bg-flamingo-dark disabled:opacity-50"
+          >
             Find the place
           </button>
+        </form>
+      )}
+
+      {step.name === "questions" && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            identify(step.questions.map((question, i) => ({ question, answer: step.answers[i] })));
+          }}
+          className="flex flex-col gap-4"
+        >
+          <FlamingoSays>
+            <p className="font-semibold">I couldn&apos;t tell which place this is. Can you help me out?</p>
+          </FlamingoSays>
+          <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 shadow-sm">
+            {step.questions.map((question, i) => (
+              <Label key={i} text={question}>
+                <input
+                  value={step.answers[i]}
+                  onChange={(e) => setStep({ ...step, answers: step.answers.map((a, j) => (j === i ? e.target.value : a)) })}
+                  className="input"
+                />
+              </Label>
+            ))}
+            <div className="flex gap-2">
+              <button disabled={!!busy || step.answers.every((a) => !a.trim())} className="rounded-full bg-flamingo px-5 py-2 font-bold text-white disabled:opacity-50">
+                Find it
+              </button>
+              <button type="button" onClick={reset} className="rounded-full border border-line px-5 py-2 font-semibold text-muted">
+                Cancel
+              </button>
+            </div>
+          </div>
         </form>
       )}
 

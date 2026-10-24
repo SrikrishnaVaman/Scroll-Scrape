@@ -81,7 +81,7 @@ Build mode: learn
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored: after slice 3, Krishna saves his own posts and plans a day with them, so feedback on saving and planning can still shape slices 4 to 7
+- [x] Early usable behavior explored: after slice 3, Krishna saves his own posts and plans a day with them, so feedback on saving and planning can still shape slices 4 to 7
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -107,4 +107,4 @@ Activity mode:
 - Turned off Next.js 16 Cache Components — every page shows one user's own data, so prerendering added complexity without benefit.
 - City for a plan is matched against the user's own space names instead of a separate Gemini call — saves free-tier quota and gives the same "which city?" behaviour.
 - Transit times use the planned time of day — at night, "leave now" transit times were nearly double.
-
+- Save a post is now link or screenshots (up to 4 reel frames), with caption and comments optional, and unclear posts go straight to the flamingo's questions — Krishna's checkpoint feedback: many creators show the place only in the video, so a required caption made saving harder. The questions flow moved forward from slice 6; Google lookups now include the branch or area so chains match the right outlet.

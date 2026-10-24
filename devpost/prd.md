@@ -62,17 +62,17 @@ Screens reached from these:
 ### Saving a Place
 Source: `scope.md > The Core Loop` (Save), `scope.md > The POC Boundary` (Place capture).
 
-The Add screen offers two options: **Save a post** and **Add photos** (see *Memories*). Under *Save a post*, the user pastes the post link and its caption, and may also paste comments from under the post. Alternatively, they drop in a screenshot of the post. Scroll Scrape reads only what the user provides; it does not open the post itself (`scope.md > Explicitly Cut`).
+The Add screen offers two options: **Save a post** and **Add photos** (see *Memories*). Under *Save a post*, the user pastes the post link, drops in up to four screenshots (for reels, paused frames that show the place), or both. The caption and comments are optional extras, tucked behind "Add the caption or comments", because many creators show the place only on screen and not in the caption. *(Revised 25 October 2026 after Krishna's first hands-on check.)* Scroll Scrape reads only what the user provides; it does not open the post itself (`scope.md > Explicitly Cut`).
 
 The AI identifies the place name, the type of place (for example bowling alley, Italian restaurant, café) and the city. A confirmation card shows these with the place's address from map data and the post link. The user confirms or edits any field before saving.
 
-If the AI cannot identify the place from the caption, the flamingo asks the user to paste comments from the post or add a screenshot of them. If that still isn't enough, the flamingo asks a few short questions (the place's name, the city or area, the type of place) and then shows the confirmation card.
+If the AI cannot identify the place, or the user gave only a link (the app never opens the post itself), the flamingo asks a few short questions (the place's name, the city or area, the type of place) and then shows the confirmation card.
 
 - As someone who saves places from Instagram, I want to save a post in a few seconds so that it isn't lost in my saved folders.
   - [ ] Pasting the link and caption of a real Instagram post that names a place shows a confirmation card with the correct place name, type and city.
   - [ ] Dropping in a screenshot of the same post produces the same confirmation card.
   - [ ] Editing a field on the card and confirming saves the edited version.
-  - [ ] A post the AI cannot identify leads to a request for comments, then to the flamingo's questions, and the place can still be saved.
+  - [ ] A post the AI cannot identify, or a bare link, leads to the flamingo's questions, and the place can still be saved.
 
 ### City Spaces
 Source: `scope.md > The Core Loop` (Save).
@@ -172,7 +172,7 @@ Decisions made by Krishna during the interview:
 - **The plan's shape follows the request** (one stop or several), followed by an offer to plan the rest of the day.
 - **No separate budget feature**, because it would complicate the build; budget words in the request are still understood.
 - **Photos are added from the Add screen**, alongside saving posts.
-- **Fallback for unidentified posts:** comments first, then the flamingo's questions.
+- **Fallback for unidentified posts:** the flamingo's questions (revised from "comments first" on 25 October 2026; comments stay available as an optional extra).
 - **Light, cozy look** inspired by ReciMe and mymind.
 
 Assumptions written into this draft, to confirm:

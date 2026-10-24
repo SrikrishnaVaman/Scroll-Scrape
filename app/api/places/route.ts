@@ -7,7 +7,7 @@ import type { PlaceCard } from "@/lib/types";
 
 type Body = {
   card: PlaceCard;
-  postUrl: string;
+  postUrl?: string;
   caption?: string;
   source: "link" | "screenshot";
   createSpace: boolean;
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         price_range: card.priceRange,
         cost_per_person: googlePrice ?? estimate.costPerPerson,
         busy_times: estimate.busyTimes,
-        post_url: postUrl,
+        post_url: postUrl || null,
         caption: caption ?? null,
         source,
       })

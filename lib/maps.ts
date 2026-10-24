@@ -73,6 +73,7 @@ function component(details: PlaceDetails, ...types: string[]) {
 export async function lookupPlace(input: {
   name: string;
   type: string;
+  area?: string;
   city: string;
   country: string;
 }): Promise<PlaceCard> {
@@ -94,7 +95,7 @@ export async function lookupPlace(input: {
     googleMapsUri: null,
   };
 
-  const id = await findPlaceId([input.name, input.city, input.country].filter(Boolean).join(", "));
+  const id = await findPlaceId([input.name, input.area, input.city, input.country].filter(Boolean).join(", "));
   if (!id) return empty;
 
   const d = await getDetails(id);
