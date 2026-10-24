@@ -19,7 +19,7 @@ Build mode: learn
   Learner check: Open http://localhost:3000, create an account with your own email and a username, check that you land on Home with the dock, open Profile to see your username, sign out, and sign back in.
   Commit: `Add sign-up, sign-in, app shell and database schema`
 
-- [ ] **2. You can save an Instagram post as a real place in a city space**
+- [x] **2. You can save an Instagram post as a real place in a city space**
   Becomes usable: On Add > Save a post, pasting a post link with its caption (or dropping a screenshot) shows a confirmation card with the place name, type, city and Google address. Editing a field and pressing "Look up again" refreshes it. Confirming the first place in a city brings up the flamingo's "Create a space for Singapore?" prompt; Yes saves it, No returns to the card. Saved lists each city space with its place count.
   Why now: This is the riskiest step in the whole build: two outside services (Gemini and Google Places) must return what the spec assumes, and the plan in slice 3 needs real saved places to choose from. Finding a wrong model name or a Places field problem now is cheap.
   PRD ref: `prd.md > Saving a Place` (first three criteria), `prd.md > City Spaces`
