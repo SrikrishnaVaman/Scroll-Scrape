@@ -69,7 +69,7 @@ Build mode: learn
   Learner check: On the live URL, sign in to the demo account on your phone, plan a lunch, say yes to the rest of the day, and check Profile's counts. Then try saving a post whose caption doesn't name the place.
   Commit: `Add fallback questions, rest-of-day plans, profile counts and deployment`
 
-- [ ] **7. Your outing photos become Memories on the places you visited**
+- [x] **7. Your outing photos become Memories on the places you visited**
   Becomes usable: On Add > Add photos, dropping in photos from an outing reads each photo's location and date, matches it to a saved place within 200 metres, shrinks and uploads it, and marks the place visited. Unmatched photos can be attached by hand or skipped. Memories shows photos grouped by place and date, and each place's photos appear on its Place Details.
   Why now: Built last because it is the first thing to drop if time runs short, and nothing else depends on it.
   PRD ref: `prd.md > Memories`
@@ -111,3 +111,4 @@ Activity mode:
 - Home became a full-screen colourful world map with a big serif "Where to next…" search (mymind-inspired), pins drawn inside the map, and a zoomed view on phones — Krishna's feedback that the first version worked but looked bland.
 - Colour pass on every page (pastel header bands with serif titles, colour washes, gradient cards) — Krishna's feedback that the other pages looked bland next to the new Home.
 - Added `vercel.json` naming the framework — the Vercel project was created before the code existed, so it defaulted to a static site and failed looking for a `public` output folder. Live at https://scroll-scrape.vercel.app.
+- Photo metadata is read with exifr's full GPS parse — picking only latitude/longitude fields silently skipped the step that computes them, so every photo came out "no location" until a test photo caught it.

@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { Check, ChevronLeft, Clock, ExternalLink, MapPin, Star, Users, Wallet } from "lucide-react";
 import EstimateChip from "@/components/EstimateChip";
 import PageHeader from "@/components/PageHeader";
+import PhotoGrid from "@/components/PhotoGrid";
 import { placeIcon } from "@/components/placeIcon";
+import { getPhotos } from "@/lib/memories";
 import { createClient } from "@/lib/supabase/server";
+
 import type { Place } from "@/lib/types";
 
 const NA = <span className="text-muted">Not available</span>;
@@ -16,6 +19,8 @@ export default async function PlacePage({ params }: PageProps<"/place/[placeId]"
   const { data } = await supabase.from("places").select("*, spaces(city)").eq("id", placeId).maybeSingle();
   if (!data) notFound();
   const place = data as Place & { spaces: { city: string } };
+
+  const photos = await getPhotos(placeId);
 
   // Everything here was stored at save time, so viewing a place makes no Google calls.
   const { Icon, tint } = placeIcon(place.place_type);
@@ -96,7 +101,11 @@ export default async function PlacePage({ params }: PageProps<"/place/[placeId]"
 
       <section>
         <h2 className="mb-2 font-bold">Your photos</h2>
-        <p className="text-sm text-muted">No photos yet. After you visit, add photos from Add and they&apos;ll appear here.</p>
+        {photos.length ? (
+          <PhotoGrid photos={photos} />
+        ) : (
+          <p className="text-sm text-muted">No photos yet. After you visit, add photos from Add and they&apos;ll appear here.</p>
+        )}
       </section>
     </div>
   );

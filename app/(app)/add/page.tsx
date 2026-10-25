@@ -1,17 +1,39 @@
+import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
+import PhotoDrop from "@/components/PhotoDrop";
 import SavePost from "./SavePost";
 
-export default function AddPage() {
+export default async function AddPage({ searchParams }: PageProps<"/add">) {
+  const { tab } = await searchParams;
+  const photos = tab === "photos";
+
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Save a place" tone="lilac" subtitle="Found somewhere on Instagram? Keep it here before it gets lost." />
+      <PageHeader
+        title={photos ? "Add photos" : "Save a place"}
+        tone="lilac"
+        subtitle={photos ? "Back from an outing? Your photos will find their places." : "Found somewhere on Instagram? Keep it here before it gets lost."}
+      />
       <div className="flex gap-2">
-        <span className="rounded-full bg-flamingo px-4 py-1.5 text-sm font-bold text-white">Save a post</span>
-        <span className="rounded-full border border-line px-4 py-1.5 text-sm font-semibold text-muted" title="Coming later in the build">
+        <Tab href="/add" active={!photos}>
+          Save a post
+        </Tab>
+        <Tab href="/add?tab=photos" active={photos}>
           Add photos
-        </span>
+        </Tab>
       </div>
-      <SavePost />
+      {photos ? <PhotoDrop /> : <SavePost />}
     </div>
+  );
+}
+
+function Tab({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={`rounded-full px-4 py-1.5 text-sm font-bold ${active ? "bg-flamingo text-white" : "border border-line bg-surface text-muted hover:text-ink"}`}
+    >
+      {children}
+    </Link>
   );
 }
