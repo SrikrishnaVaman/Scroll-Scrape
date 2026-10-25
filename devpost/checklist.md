@@ -59,7 +59,7 @@ Build mode: learn
   Learner check: On Home, search "Singapore" and watch the flamingo fly before City View opens. Then search a city you have no saves in and check what the flamingo says.
   Commit: `Add world map Home with city search and flamingo flight`
 
-- [ ] **6. Tricky posts, the rest of the day, and a live app for judges**
+- [x] **6. Tricky posts, the rest of the day, and a live app for judges**
   Becomes usable: A post the AI can't identify asks for comments, then the flamingo's short questions, and can still be saved. After a plan, the flamingo offers to fill the rest of the day and extends it from other saves. Profile shows places saved, cities and places visited. If Gemini's free quota runs out, the flamingo says it needs a short rest instead of breaking. The app is live on Vercel from a public GitHub repo, with a README describing the demo account.
   Why now: These are the edges around the working core. The rest-of-day follow-up is the third item on the cut list, so it sits after the main journey. Going live here leaves time to fix deployment surprises before the deadline.
   PRD ref: `prd.md > Saving a Place` (fallback criterion), `prd.md > Planning With the Flamingo` (rest-of-day criterion), `prd.md > Profile` (counts, other device), `prd.md > States and Boundaries`
@@ -110,3 +110,4 @@ Activity mode:
 - Save a post is now link or screenshots (up to 4 reel frames), with caption and comments optional, and unclear posts go straight to the flamingo's questions — Krishna's checkpoint feedback: many creators show the place only in the video, so a required caption made saving harder. The questions flow moved forward from slice 6; Google lookups now include the branch or area so chains match the right outlet.
 - Home became a full-screen colourful world map with a big serif "Where to next…" search (mymind-inspired), pins drawn inside the map, and a zoomed view on phones — Krishna's feedback that the first version worked but looked bland.
 - Colour pass on every page (pastel header bands with serif titles, colour washes, gradient cards) — Krishna's feedback that the other pages looked bland next to the new Home.
+- Added `vercel.json` naming the framework — the Vercel project was created before the code existed, so it defaulted to a static site and failed looking for a `public` output folder. Live at https://scroll-scrape.vercel.app.
