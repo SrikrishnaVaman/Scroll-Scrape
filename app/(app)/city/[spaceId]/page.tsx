@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import CityMap from "@/components/CityMap";
+import PageHeader from "@/components/PageHeader";
 import PlaceList from "@/components/PlaceList";
 import { createClient } from "@/lib/supabase/server";
 import type { Place } from "@/lib/types";
@@ -31,15 +32,15 @@ export default async function CityPage({ params }: PageProps<"/city/[spaceId]">)
 
   return (
     <div className="flex flex-col gap-5">
-      <Link href="/saved" className="flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
-        <ChevronLeft size={16} /> Saved
-      </Link>
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-bold">{space.city}</h1>
-        <span className="text-muted">
-          {places.length} {places.length === 1 ? "place" : "places"}
-        </span>
-      </div>
+      <PageHeader
+        title={space.city}
+        tone="lagoon"
+        subtitle={`${places.length} saved ${places.length === 1 ? "place" : "places"} in ${space.country}`}
+      >
+        <Link href="/saved" className="mb-2 flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
+          <ChevronLeft size={16} /> Saved
+        </Link>
+      </PageHeader>
       <CityMap center={center} places={pinned} />
       <PlaceList places={places} />
     </div>

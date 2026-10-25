@@ -121,7 +121,7 @@ export default function SavePost() {
               e.preventDefault();
               addScreenshots(e.dataTransfer.files);
             }}
-            className="flex cursor-pointer flex-col items-center gap-2 rounded-card border-2 border-dashed border-line bg-cream px-4 py-6 text-center text-muted transition hover:border-flamingo"
+            className="flex cursor-pointer flex-col items-center gap-2 rounded-card border-2 border-dashed border-flamingo/40 bg-gradient-to-br from-[#FFE3EA] via-[#FFF1E8] to-[#E2F4FB] px-4 py-8 text-center text-muted transition hover:border-flamingo"
           >
             <ImagePlus size={28} className="text-flamingo" />
             <span className="font-semibold text-ink">Drop screenshots here or tap to choose</span>

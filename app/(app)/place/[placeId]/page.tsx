@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ChevronLeft, Clock, ExternalLink, MapPin, Star, Users, Wallet } from "lucide-react";
 import EstimateChip from "@/components/EstimateChip";
+import PageHeader from "@/components/PageHeader";
 import { placeIcon } from "@/components/placeIcon";
 import { createClient } from "@/lib/supabase/server";
 import type { Place } from "@/lib/types";
@@ -24,24 +25,27 @@ export default async function PlacePage({ params }: PageProps<"/place/[placeId]"
 
   return (
     <div className="flex flex-col gap-5">
-      <Link href={`/city/${place.space_id}`} className="flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
-        <ChevronLeft size={16} /> {place.spaces.city}
-      </Link>
-
-      <header className="flex items-center gap-4">
-        <div className={`flex size-16 shrink-0 items-center justify-center rounded-card ${tint}`}>
-          <Icon size={28} className="text-ink/70" />
+      <PageHeader
+        title={place.name}
+        tone="pink"
+        subtitle={
+          <span className="flex flex-wrap items-center gap-2">
+            {[place.place_type, place.area].filter(Boolean).join(" · ")}
+            {place.visited && (
+              <span className="flex items-center gap-1 rounded-full bg-lagoon/15 px-2 py-0.5 text-sm font-semibold text-lagoon">
+                <Check size={14} /> Visited
+              </span>
+            )}
+          </span>
+        }
+      >
+        <Link href={`/city/${place.space_id}`} className="mb-3 flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
+          <ChevronLeft size={16} /> {place.spaces.city}
+        </Link>
+        <div className={`mb-3 flex size-14 items-center justify-center rounded-card shadow-sm ${tint}`}>
+          <Icon size={26} className="text-ink/70" />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">{place.name}</h1>
-          <p className="text-muted">{[place.place_type, place.area].filter(Boolean).join(" · ")}</p>
-          {place.visited && (
-            <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-lagoon">
-              <Check size={14} /> Visited
-            </p>
-          )}
-        </div>
-      </header>
+      </PageHeader>
 
       <section className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface shadow-sm">
         <Row icon={<Clock size={18} />} label="Opening hours">

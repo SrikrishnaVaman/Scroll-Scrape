@@ -109,3 +109,4 @@ Activity mode:
 - Transit times use the planned time of day — at night, "leave now" transit times were nearly double.
 - Save a post is now link or screenshots (up to 4 reel frames), with caption and comments optional, and unclear posts go straight to the flamingo's questions — Krishna's checkpoint feedback: many creators show the place only in the video, so a required caption made saving harder. The questions flow moved forward from slice 6; Google lookups now include the branch or area so chains match the right outlet.
 - Home became a full-screen colourful world map with a big serif "Where to next…" search (mymind-inspired), pins drawn inside the map, and a zoomed view on phones — Krishna's feedback that the first version worked but looked bland.
+- Colour pass on every page (pastel header bands with serif titles, colour washes, gradient cards) — Krishna's feedback that the other pages looked bland next to the new Home.

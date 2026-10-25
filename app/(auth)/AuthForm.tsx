@@ -13,10 +13,11 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const isSignup = mode === "signup";
 
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-12">
+    <main className="flex w-full flex-1 flex-col justify-center bg-gradient-to-br from-[#FFD6E1] via-cream to-[#C6E9F7] px-6 py-12">
+      <div className="mx-auto w-full max-w-sm">
       <div className="mb-6 flex flex-col items-center text-center">
         <Flamingo className="w-20" />
-        <h1 className="mt-2 text-3xl font-bold">Scroll Scrape</h1>
+        <h1 className="mt-2 font-serif text-5xl italic">Scroll Scrape</h1>
         <p className="text-muted">Saved places become plans.</p>
       </div>
 
@@ -46,6 +47,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {isSignup ? "Sign in" : "Create an account"}
         </Link>
       </p>
+      </div>
     </main>
   );
 }

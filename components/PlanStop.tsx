@@ -15,16 +15,18 @@ export type Stop = {
 };
 
 // One stop in the flamingo's plan, linking to the place's details.
-export default function PlanStop({ stop }: { stop: Stop }) {
+const ACCENTS = ["border-l-flamingo", "border-l-lagoon", "border-l-coral", "border-l-violet-400", "border-l-emerald-400"];
+
+export default function PlanStop({ stop, index = 0 }: { stop: Stop; index?: number }) {
   const { place } = stop;
   return (
     <Link
       href={`/place/${place.id}`}
-      className="block rounded-card border border-line bg-surface p-4 shadow-sm transition hover:border-flamingo"
+      className={`block rounded-card border border-l-8 border-line bg-surface p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${ACCENTS[index % ACCENTS.length]}`}
     >
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-bold uppercase tracking-wide text-flamingo">{stop.purpose}</p>
-        <p className="text-lg font-bold">{stop.suggestedTime}</p>
+        <p className="rounded-full bg-flamingo/10 px-3 py-0.5 font-serif text-xl text-flamingo-dark italic">{stop.suggestedTime}</p>
       </div>
       <p className="text-lg font-bold">{place.name}</p>
       <p className="text-sm text-muted">

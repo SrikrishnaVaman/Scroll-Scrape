@@ -70,7 +70,7 @@ export default function PlanChat() {
           {turn.stops?.length ? (
             <div className="flex flex-col gap-2">
               {turn.day && <p className="text-xs font-bold uppercase tracking-wide text-muted">Plan for {turn.day}</p>}
-              {turn.stops.map((stop) => (
+              {turn.stops.map((stop, n) => (
                 <Fragment key={stop.placeId}>
                   {stop.travelMinutesFromPrevious != null && (
                     <p className="flex items-center gap-1.5 pl-2 text-sm text-muted">
@@ -78,7 +78,7 @@ export default function PlanChat() {
                       {stop.travelMinutesFromPrevious} min to the next stop
                     </p>
                   )}
-                  <PlanStop stop={stop} />
+                  <PlanStop stop={stop} index={n} />
                 </Fragment>
               ))}
             </div>
