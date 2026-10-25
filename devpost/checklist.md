@@ -91,15 +91,15 @@ Build mode: learn
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
 - [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: guided route through "plan a day" sent to Krishna (front end → back end → guard), tied to his goal of owning data flow and front/back structure; awaiting his walk-through.
-Route and stops: `app/(app)/plan/PlanChat.tsx` `send` → `app/api/plan/route.ts` `POST` → `lib/guard.ts` `keepSavedStops` (stops not yet confirmed as walked).
-Edit outcome: offered (change `GREETING` in PlanChat.tsx); no answer yet.
-Reflection: not yet offered.
-Activity mode: live app and editor, guided by message.
+Activity and evidence: brief recap. The "plan a day" route (front end → back end → guard) was sent as a guided walk-through tied to Krishna's goal of owning data flow and front/back structure; he wrapped up late at night, so the stops were not walked live together. The reusable practice (enforce the core rule in code and prove it with a check) is grounded in `lib/guard.ts` and `scripts/check-guard.ts`.
+Route and stops: reference route only — `app/(app)/plan/PlanChat.tsx` `send` → `app/api/plan/route.ts` `POST` → `lib/guard.ts` `keepSavedStops`.
+Edit outcome: declined (offered changing `GREETING` in PlanChat.tsx).
+Reflection: not offered — learner short on time.
+Activity mode: recap with the app map.
 
 ## Revisions
 
