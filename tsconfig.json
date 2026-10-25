@@ -38,6 +38,8 @@
   ],
   "exclude": [
     "node_modules",
-    "scripts"
+    "scripts",
+    "**/* 2.ts",
+    "**/* 2.tsx"
   ]
 }

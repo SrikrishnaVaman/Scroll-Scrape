@@ -49,7 +49,7 @@ Build mode: learn
   Learner check: From Saved, open Singapore, count the pins against the list, tap one, and check its details against Google Maps. Tap the post link to make sure it opens the original post.
   Commit: `Add City View map and Place Details`
 
-- [ ] **5. Home shows your cities on a world map and the flamingo flies there**
+- [x] **5. Home shows your cities on a world map and the flamingo flies there**
   Becomes usable: Home shows the flat world map with a dot for each of your city spaces and the flamingo waiting. Searching "Singapore" sends the flamingo flying to its dot, then opens City View. Searching a city you haven't saved makes the flamingo say so with a shortcut to Add. A first-time user sees the flamingo inviting them to save a first place. A shortcut to Memories sits on Home.
   Why now: It is the app's front door and the flamingo's personality moment, but it only displays data the earlier slices already create, so it can safely come after the kernel. The flight animation is the second item on the cut list.
   PRD ref: `prd.md > Home and City Search`, `prd.md > States and Boundaries` (first use)
@@ -108,3 +108,4 @@ Activity mode:
 - City for a plan is matched against the user's own space names instead of a separate Gemini call — saves free-tier quota and gives the same "which city?" behaviour.
 - Transit times use the planned time of day — at night, "leave now" transit times were nearly double.
 - Save a post is now link or screenshots (up to 4 reel frames), with caption and comments optional, and unclear posts go straight to the flamingo's questions — Krishna's checkpoint feedback: many creators show the place only in the video, so a required caption made saving harder. The questions flow moved forward from slice 6; Google lookups now include the branch or area so chains match the right outlet.
+- Home became a full-screen colourful world map with a big serif "Where to next…" search (mymind-inspired), pins drawn inside the map, and a zoomed view on phones — Krishna's feedback that the first version worked but looked bland.
