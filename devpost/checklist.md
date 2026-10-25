@@ -93,13 +93,13 @@ Build mode: learn
 
 - [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
 - [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence:
-Route and stops:
-Edit outcome:
-Reflection:
-Activity mode:
+Activity and evidence: guided route through "plan a day" sent to Krishna (front end → back end → guard), tied to his goal of owning data flow and front/back structure; awaiting his walk-through.
+Route and stops: `app/(app)/plan/PlanChat.tsx` `send` → `app/api/plan/route.ts` `POST` → `lib/guard.ts` `keepSavedStops` (stops not yet confirmed as walked).
+Edit outcome: offered (change `GREETING` in PlanChat.tsx); no answer yet.
+Reflection: not yet offered.
+Activity mode: live app and editor, guided by message.
 
 ## Revisions
 

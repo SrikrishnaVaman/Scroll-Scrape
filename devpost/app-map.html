@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll Scrape App Map</title>
+<style>
+  :root {
+    --cream: #FFF8F3; --surface: #FFFFFF; --ink: #2B2A33; --muted: #6E6A72; --line: #EFE6E0;
+    --pink: #F2668B; --pink-soft: #FFE3EA; --blue: #3FA7D6; --blue-soft: #E2F4FB; --peach-soft: #FFF1DE;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font: italic 400 3rem/1.1 Georgia, "Times New Roman", serif; margin: 0 0 4px; }
+  h2 { font: italic 400 1.9rem/1.2 Georgia, serif; margin: 40px 0 8px; }
+  h3 { margin: 0 0 4px; font-size: 1.05rem; }
+  p.lead { color: var(--muted); margin-top: 0; }
+  code { background: var(--peach-soft); padding: 1px 6px; border-radius: 6px; font-size: .92em; }
+  pre { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; overflow-x: auto; font-size: .88rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin: 12px 0; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .pill { display: inline-block; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 10px; border-radius: 999px; }
+  .browser { background: var(--pink-soft); color: #B23A5F; }
+  .server { background: var(--blue-soft); color: #1F6F94; }
+  .service { background: var(--peach-soft); color: #8A5A1F; }
+  ol.route > li { margin-bottom: 14px; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  svg { width: 100%; height: auto; display: block; }
+  .note { color: var(--muted); font-size: .9rem; }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Scroll Scrape</h1>
+  <p class="lead">A map of the app as built, for finding your way around the code. Snapshot of commit <code>0f30048</code> (25 October 2026); the code may change after this.</p>
+
+  <h2>What it is</h2>
+  <p>Scroll Scrape turns places you save from Instagram into plans. You <b>save</b> a place from a screenshot or caption, <b>browse</b> your saves by city on a world map, ask the flamingo to <b>plan</b> a day using only your saves, and file outing photos under the places you visited (<b>Memories</b>).</p>
+  <div class="grid">
+    <div class="card"><span class="pill browser">Browser</span><h3>Screens</h3>React pages in <code>app/(app)/</code>: Home, Saved, Add, Plan, Profile, City View, Place Details, Memories.</div>
+    <div class="card"><span class="pill server">Server (Vercel)</span><h3>API routes</h3><code>app/api/</code> holds the secret keys: <code>identify</code>, <code>lookup</code>, <code>places</code>, <code>plan</code>.</div>
+    <div class="card"><span class="pill service">Services</span><h3>Supabase · Gemini · Google Maps</h3>Supabase stores and protects data; Gemini finds and chooses; Google Maps supplies the facts.</div>
+  </div>
+
+  <h2>One action, end to end: “plan a day”</h2>
+  <svg viewBox="0 0 780 250" role="img" aria-labelledby="flowTitle">
+    <title id="flowTitle">Plan a day: the browser sends the conversation to the plan route, which reads your saves from Supabase, asks Gemini to choose by ID, keeps only saved IDs with the guard, asks Google Routes for travel times, and returns stop cards.</title>
+    <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6E6A72"/></marker></defs>
+    <g font-family="system-ui, sans-serif" font-size="13">
+      <rect x="10" y="90" width="150" height="70" rx="14" fill="#FFE3EA" stroke="#F2668B"/>
+      <text x="85" y="118" text-anchor="middle" font-weight="700">Plan chat</text>
+      <text x="85" y="138" text-anchor="middle" fill="#6E6A72">PlanChat.tsx · send()</text>
+
+      <rect x="230" y="90" width="170" height="70" rx="14" fill="#E2F4FB" stroke="#3FA7D6"/>
+      <text x="315" y="118" text-anchor="middle" font-weight="700">/api/plan</text>
+      <text x="315" y="138" text-anchor="middle" fill="#6E6A72">route.ts · POST</text>
+
+      <rect x="470" y="90" width="150" height="70" rx="14" fill="#E2F4FB" stroke="#3FA7D6"/>
+      <text x="545" y="118" text-anchor="middle" font-weight="700">The guard</text>
+      <text x="545" y="138" text-anchor="middle" fill="#6E6A72">guard.ts · keepSavedStops</text>
+
+      <rect x="660" y="90" width="110" height="70" rx="14" fill="#FFE3EA" stroke="#F2668B"/>
+      <text x="715" y="118" text-anchor="middle" font-weight="700">Stop cards</text>
+      <text x="715" y="138" text-anchor="middle" fill="#6E6A72">PlanStop.tsx</text>
+
+      <rect x="160" y="10" width="130" height="44" rx="12" fill="#FFF1DE" stroke="#E0B27A"/>
+      <text x="225" y="37" text-anchor="middle">Supabase: your saves</text>
+      <rect x="330" y="10" width="130" height="44" rx="12" fill="#FFF1DE" stroke="#E0B27A"/>
+      <text x="395" y="37" text-anchor="middle">Gemini: choose by ID</text>
+      <rect x="440" y="196" width="160" height="44" rx="12" fill="#FFF1DE" stroke="#E0B27A"/>
+      <text x="520" y="223" text-anchor="middle">Google Routes: travel</text>
+
+      <line x1="160" y1="125" x2="228" y2="125" stroke="#6E6A72" stroke-width="1.6" marker-end="url(#arrow)"/>
+      <line x1="400" y1="125" x2="468" y2="125" stroke="#6E6A72" stroke-width="1.6" marker-end="url(#arrow)"/>
+      <line x1="620" y1="125" x2="658" y2="125" stroke="#6E6A72" stroke-width="1.6" marker-end="url(#arrow)"/>
+      <line x1="285" y1="88" x2="245" y2="56" stroke="#6E6A72" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <line x1="345" y1="88" x2="380" y2="56" stroke="#6E6A72" stroke-width="1.4" marker-end="url(#arrow)"/>
+      <line x1="560" y1="162" x2="535" y2="194" stroke="#6E6A72" stroke-width="1.4" marker-end="url(#arrow)"/>
+    </g>
+  </svg>
+
+  <ol class="route">
+    <li><span class="pill browser">Browser</span> <b><code>app/(app)/plan/PlanChat.tsx</code></b>, search for <code>async function send</code>.<br>
+      Sends the whole conversation plus today's day and time to <code>fetch("/api/plan")</code>. Sending the history is what lets “yes, plan the rest of the day” build on the earlier plan.</li>
+    <li><span class="pill server">Server</span> <b><code>app/api/plan/route.ts</code></b>, search for <code>export async function POST</code>.<br>
+      Matches the city against your own spaces, loads only your places from Supabase, and asks Gemini (<code>askJson&lt;PlanResult&gt;</code>) to answer with place IDs. Then it checks opening hours (<code>lib/hours.ts</code>) and asks Google for transit times (<code>travelMinutes(</code> in <code>lib/maps.ts</code>).</li>
+    <li><span class="pill server">Server</span> <b><code>lib/guard.ts</code></b>, search for <code>keepSavedStops</code>.<br>
+      Drops any ID that is not one of your saved places, and any repeats, before the plan reaches you. <code>node scripts/check-guard.ts</code> feeds it a made-up ID to confirm.</li>
+  </ol>
+  <p class="note">This is a reference route through the code, written for the learning wrap-up.</p>
+
+  <h2>To change this, start here</h2>
+  <div class="card">
+    <details open><summary>What the flamingo says first on Plan</summary><p><code>app/(app)/plan/PlanChat.tsx</code> → <code>const GREETING</code></p></details>
+    <details><summary>How Gemini reads posts, estimates busy times, or plans</summary><p><code>lib/prompts.ts</code> → <code>IDENTIFY_PROMPT</code>, <code>ENRICH_PROMPT</code>, <code>PLAN_PROMPT</code>, each with the JSON shape the reply must follow.</p></details>
+    <details><summary>Which facts come from Google Maps</summary><p><code>lib/maps.ts</code> → <code>DETAIL_FIELDS</code> and <code>lookupPlace</code>. Facts are stored once, when you save, in <code>app/api/places/route.ts</code>.</p></details>
+    <details><summary>Colours and fonts</summary><p><code>app/globals.css</code> (palette under <code>@theme</code>), <code>app/layout.tsx</code> (Nunito and Instrument Serif), <code>components/PageHeader.tsx</code> (each page's pastel band).</p></details>
+    <details><summary>The world map and the flamingo's flight</summary><p><code>components/WorldMap.tsx</code> (pins, search, <code>flyTo</code>), <code>lib/geo.ts</code> (<code>toMapXY</code>), <code>lib/worldLand.ts</code> (land shapes).</p></details>
+    <details><summary>How photos match places</summary><p><code>lib/photos.ts</code> (<code>readPhotoMeta</code>, <code>savePhoto</code>), <code>lib/geo.ts</code> (<code>nearestPlace</code>, 200 m), <code>components/PhotoDrop.tsx</code>.</p></details>
+    <details><summary>Database tables and privacy rules</summary><p><code>supabase/migrations/</code>. Row-level security limits every table to <code>user_id = auth.uid()</code>.</p></details>
+  </div>
+
+  <h2>A practice to reuse</h2>
+  <div class="card">
+    <p><b>Enforce the product's promise in code, then prove it with a small check.</b> “Plans come only from your saves” is Scroll Scrape's core rule (<code>scope.md</code> › The Unique Kernel). Asking Gemini nicely was not enough, so the plan route makes Gemini answer with IDs. <code>keepSavedStops</code> then throws away anything else, and <code>scripts/check-guard.ts</code> proves it with a made-up ID.</p>
+    <p>The same habit caught a real bug in Memories. A test photo with a known location came back “no location”, which exposed that reading only some fields skipped the step that computes latitude and longitude. On your next project, write down the one rule your app must never break. Put it in a function you can test on its own, and check it with a real input.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <pre>npm install
+cp .env.example .env.local   # fill in the keys
+npm run dev                  # http://localhost:3000</pre>
+  <p>Live: <a href="https://scroll-scrape.vercel.app">scroll-scrape.vercel.app</a>. Checks: <code>npm run check:auth</code>, <code>node scripts/check-guard.ts</code>, <code>node scripts/check-geo.ts</code>, <code>node scripts/check-photos.ts</code>.</p>
+</main>
+</body>
+</html>
