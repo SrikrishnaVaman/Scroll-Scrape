@@ -10,7 +10,7 @@ Built for Devpost's *Build With AI: Basics* hackathon.
 
 ## Try it
 
-**Live:** _link added after deployment_
+**Live:** https://scroll-scrape.vercel.app
 
 Sign up with any email, password and username (no confirmation email), or use the demo account, which is filled with real Singapore places:
 
