@@ -21,6 +21,8 @@ type Item = {
 export default function PhotoDrop() {
   const [places, setPlaces] = useState<SavedPlace[]>([]);
   const [items, setItems] = useState<Item[]>([]);
+  // Chosen once before dropping: "" means match each photo by its location.
+  const [forPlace, setForPlace] = useState("");
 
   useEffect(() => {
     createClient()
@@ -51,7 +53,9 @@ export default function PhotoDrop() {
     const added = await Promise.all(
       Array.from(files).map(async (file) => {
         const meta = await readPhotoMeta(file);
-        const place = meta.lat != null && meta.lng != null ? nearestPlace(places, { lat: meta.lat, lng: meta.lng }) : null;
+        const chosen = places.find((p) => p.id === forPlace);
+        const place =
+          chosen ?? (meta.lat != null && meta.lng != null ? nearestPlace(places, { lat: meta.lat, lng: meta.lng }) : null);
         return { file, preview: URL.createObjectURL(file), meta, place: place ?? undefined, status: place ? "saving" : "unmatched" } as Item;
       }),
     );
@@ -63,6 +67,18 @@ export default function PhotoDrop() {
 
   return (
     <div className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1.5 text-sm font-semibold">
+        Where were these taken?
+        <select value={forPlace} onChange={(e) => setForPlace(e.target.value)} className="input">
+          <option value="">Work it out from each photo&apos;s location</option>
+          {places.map((p) => (
+            <option key={p.id} value={p.id}>
+              All at {p.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <label
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
@@ -73,7 +89,11 @@ export default function PhotoDrop() {
       >
         <ImagePlus size={28} className="text-lagoon" />
         <span className="font-semibold text-ink">Drop photos from your outing</span>
-        <span className="text-sm">I&apos;ll match each one to the saved place it was taken at, using its location.</span>
+        <span className="text-sm">
+          {forPlace
+            ? `They'll all go to ${places.find((p) => p.id === forPlace)?.name}.`
+            : "I'll match each one to the saved place it was taken at, using its location."}
+        </span>
         <input type="file" accept="image/*" multiple onChange={(e) => addFiles(e.target.files)} className="hidden" />
       </label>
 

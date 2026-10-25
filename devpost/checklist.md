@@ -86,6 +86,7 @@ Build mode: learn
 
 ## Final Review
 
+- [x] Photos: choose one place for a whole batch before dropping (Krishna: picking a place per photo was a hassle) — verified two location-less photos both filed under the chosen place
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
